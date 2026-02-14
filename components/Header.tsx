@@ -316,7 +316,7 @@ export default function Header({ userName, userClass }: HeaderProps) {
                                                                     {otherUser?.name || "User"}
                                                                 </span>
                                                                 <span style={{ fontSize: "11px", color: "#9ca3af", marginLeft: "0.5rem", flexShrink: 0 }}>
-                                                                    {formatTimeAgo(conv.lastMessageAt || conv.createdAt)}
+                                                                    {formatTimeAgo(conv.lastMessageAt || conv.createdAt || '')}
                                                                 </span>
                                                             </div>
                                                             <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
