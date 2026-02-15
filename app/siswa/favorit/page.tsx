@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
 import { favoritesApi } from "@/lib/api";
 import type { Favorite } from "@/types";
+import SiswaSkeleton from "@/components/SiswaSkeleton";
 
 // Cover gradients for books without covers
 const coverGradients = [
@@ -58,11 +59,7 @@ export default function FavoritPage() {
     });
 
     if (authLoading || isLoading) {
-        return (
-            <div className="dashboard-content" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}>
-                <p>Memuat...</p>
-            </div>
-        );
+        return <SiswaSkeleton variant="favorit" />;
     }
 
     return (

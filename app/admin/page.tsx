@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AdminHeader from "@/components/AdminHeader";
+import AdminSkeleton from "@/components/AdminSkeleton";
 import { useAuth } from "@/lib/auth-context";
 import { statsApi, loansApi } from "@/lib/api";
 import type { AdminStats, Loan } from "@/types";
@@ -96,9 +97,7 @@ export default function AdminDashboard() {
         return (
             <div className="admin-dashboard">
                 <AdminHeader title="Dashboard Overview" subtitle="Dashboard" />
-                <div className="admin-content" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}>
-                    <p>Memuat...</p>
-                </div>
+                <AdminSkeleton variant="dashboard" />
             </div>
         );
     }

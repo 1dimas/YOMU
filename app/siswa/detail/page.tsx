@@ -8,6 +8,7 @@ import { booksApi, favoritesApi, loansApi, reviewsApi } from "@/lib/api";
 import type { Book } from "@/types";
 import ReviewsSection from "@/components/reviews/ReviewsSection";
 import { toast } from "sonner";
+import SiswaSkeleton from "@/components/SiswaSkeleton";
 
 const coverGradients = [
     "linear-gradient(135deg, #4fd1c5 0%, #38b2ac 100%)",
@@ -130,13 +131,7 @@ function DetailBukuContent() {
     };
 
     if (authLoading || isLoading) {
-        return (
-            <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '16px' }}>
-                <div style={{ width: '40px', height: '40px', border: '3px solid #e5e7eb', borderTop: '3px solid #3b82f6', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
-                <p style={{ color: '#6b7280', fontSize: '14px', margin: 0 }}>Memuat detail buku...</p>
-                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-            </div>
-        );
+        return <SiswaSkeleton variant="detail" />;
     }
 
     if (!book) {
@@ -522,9 +517,7 @@ function DetailBukuContent() {
 
 export default function DetailBukuPage() {
     return (
-        <Suspense fallback={
-            <div style={{ padding: '2rem', textAlign: 'center' }}>Memuat...</div>
-        }>
+        <Suspense fallback={<SiswaSkeleton variant="detail" />}>
             <DetailBukuContent />
         </Suspense>
     );

@@ -1,6 +1,7 @@
 "use client";
 
 import AdminHeader from "@/components/AdminHeader";
+import AdminSkeleton from "@/components/AdminSkeleton";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
@@ -136,9 +137,7 @@ export default function KelolaKategoriPage() {
         return (
             <div className="admin-dashboard">
                 <AdminHeader title="Kategori Buku" subtitle="Kategori" />
-                <div className="admin-content" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}>
-                    <p>Memuat...</p>
-                </div>
+                <AdminSkeleton variant="table" columns={6} />
             </div>
         );
     }

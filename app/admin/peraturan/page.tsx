@@ -1,6 +1,8 @@
 "use client";
 
 import AdminHeader from "@/components/AdminHeader";
+import AdminSkeleton from "@/components/AdminSkeleton";
+import ConfirmModal from "@/components/ConfirmModal";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
@@ -42,6 +44,7 @@ export default function AdminPeraturanPage() {
     const [rules, setRules] = useState(DEFAULT_RULES);
     const [isSaving, setIsSaving] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
+    const [showResetConfirm, setShowResetConfirm] = useState(false);
 
     useEffect(() => {
         if (!authLoading && (!isAuthenticated || user?.role !== "ADMIN")) {
@@ -73,19 +76,20 @@ export default function AdminPeraturanPage() {
     };
 
     const handleReset = () => {
-        if (confirm("Reset ke peraturan default? Perubahan yang disimpan akan hilang.")) {
-            setRules(DEFAULT_RULES);
-            localStorage.removeItem("library_rules");
-        }
+        setShowResetConfirm(true);
+    };
+
+    const confirmReset = () => {
+        setRules(DEFAULT_RULES);
+        localStorage.removeItem("library_rules");
+        setShowResetConfirm(false);
     };
 
     if (authLoading) {
         return (
             <div className="admin-dashboard">
                 <AdminHeader title="Peraturan Peminjaman" subtitle="Kelola Peraturan" />
-                <div className="admin-content" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}>
-                    <p>Memuat...</p>
-                </div>
+                <AdminSkeleton variant="peraturan" />
             </div>
         );
     }
@@ -223,6 +227,17 @@ export default function AdminPeraturanPage() {
                     </p>
                 </div>
             </div>
+
+            <ConfirmModal
+                isOpen={showResetConfirm}
+                title="Reset Peraturan"
+                message="Reset ke peraturan default? Semua perubahan yang telah disimpan akan hilang."
+                confirmText="Ya, Reset"
+                cancelText="Batal"
+                variant="warning"
+                onConfirm={confirmReset}
+                onCancel={() => setShowResetConfirm(false)}
+            />
         </div>
     );
 }

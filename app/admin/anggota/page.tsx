@@ -1,6 +1,7 @@
 "use client";
 
 import AdminHeader from "@/components/AdminHeader";
+import AdminSkeleton from "@/components/AdminSkeleton";
 import MasterDataModal from "@/components/MasterDataModal";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -170,9 +171,7 @@ export default function DataAnggotaPage() {
         return (
             <div className="admin-dashboard">
                 <AdminHeader title="Manajemen Anggota" subtitle="Data Anggota" />
-                <div className="admin-content" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}>
-                    <p>Memuat...</p>
-                </div>
+                <AdminSkeleton variant="table" columns={5} />
             </div>
         );
     }
@@ -330,23 +329,14 @@ export default function DataAnggotaPage() {
                                 />
                             </div>
 
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Password {formMode === "add" ? "*" : "(kosongkan jika tidak diubah)"}</label>
-                                    <input
-                                        type="password"
-                                        placeholder={formMode === "add" ? "Minimal 6 karakter" : "••••••••"}
-                                        value={formData.password}
-                                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Role</label>
-                                    <select value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value as Role })}>
-                                        <option value="STUDENT">Siswa</option>
-                                        <option value="ADMIN">Admin</option>
-                                    </select>
-                                </div>
+                            <div className="form-group">
+                                <label>Password {formMode === "add" ? "*" : "(kosongkan jika tidak diubah)"}</label>
+                                <input
+                                    type="password"
+                                    placeholder={formMode === "add" ? "Minimal 6 karakter" : "••••••••"}
+                                    value={formData.password}
+                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                />
                             </div>
                         </div>
 

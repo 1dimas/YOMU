@@ -1,6 +1,8 @@
 "use client";
 
 import AdminHeader from "@/components/AdminHeader";
+import AdminSkeleton from "@/components/AdminSkeleton";
+import ConfirmModal from "@/components/ConfirmModal";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
@@ -34,6 +36,9 @@ export default function DataBukuPage() {
     });
     const [coverPreview, setCoverPreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Confirm delete modal state
+    const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
     useEffect(() => {
         if (!authLoading && (!isAuthenticated || user?.role !== 'ADMIN')) {
@@ -103,16 +108,20 @@ export default function DataBukuPage() {
         }
     };
 
-    const handleDelete = async (id: string) => {
-        if (!confirm(`Hapus buku ini?`)) return;
+    const handleDelete = (id: string) => {
+        setConfirmDeleteId(id);
+    };
 
+    const confirmDelete = async () => {
+        if (!confirmDeleteId) return;
         try {
-            await booksApi.delete(id);
-            // Use functional update to ensure we get the latest state
-            setBooks((prevBooks) => prevBooks.filter(b => b.id !== id));
+            await booksApi.delete(confirmDeleteId);
+            setBooks((prevBooks) => prevBooks.filter(b => b.id !== confirmDeleteId));
             toast.success("Buku berhasil dihapus");
         } catch (error) {
             toast.error(error instanceof Error ? error.message : "Gagal menghapus buku");
+        } finally {
+            setConfirmDeleteId(null);
         }
     };
 
@@ -202,9 +211,7 @@ export default function DataBukuPage() {
         return (
             <div className="admin-dashboard">
                 <AdminHeader title="Manajemen Data Buku" subtitle="Data Buku" />
-                <div className="admin-content" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}>
-                    <p>Memuat...</p>
-                </div>
+                <AdminSkeleton variant="table" columns={6} />
             </div>
         );
     }
@@ -388,6 +395,17 @@ export default function DataBukuPage() {
                     </div>
                 </div>
             )}
+
+            <ConfirmModal
+                isOpen={!!confirmDeleteId}
+                title="Hapus Buku"
+                message="Apakah Anda yakin ingin menghapus buku ini? Data buku yang dihapus tidak dapat dikembalikan."
+                confirmText="Ya, Hapus"
+                cancelText="Batal"
+                variant="danger"
+                onConfirm={confirmDelete}
+                onCancel={() => setConfirmDeleteId(null)}
+            />
         </div>
     );
 }

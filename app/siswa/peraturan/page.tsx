@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useEffect, useState } from "react";
+import SiswaSkeleton from "@/components/SiswaSkeleton";
 
 const DEFAULT_RULES = `
 ## Peraturan Peminjaman Buku Perpustakaan
@@ -59,11 +60,7 @@ export default function PeraturanPage() {
     }, [authLoading, isAuthenticated, router]);
 
     if (authLoading) {
-        return (
-            <div style={{ padding: "4rem", textAlign: "center" }}>
-                <p>Memuat...</p>
-            </div>
-        );
+        return <SiswaSkeleton variant="peraturan" />;
     }
 
     return (

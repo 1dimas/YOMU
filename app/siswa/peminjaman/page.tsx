@@ -8,6 +8,7 @@ import { loansApi } from "@/lib/api";
 import type { Loan, LoanStatus } from "@/types";
 import { BookCondition } from "@/types";
 import { toast } from "sonner";
+import SiswaSkeleton from "@/components/SiswaSkeleton";
 
 // Cover gradients for books without covers
 const coverGradients = [
@@ -129,20 +130,7 @@ export default function PeminjamanPage() {
     );
 
     if (authLoading || isLoading) {
-        return (
-            <div className="dashboard-content" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-                    <div className="loader" style={{ width: '2rem', height: '2rem', border: '3px solid #f3f3f3', borderTop: '3px solid #3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-                    <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>Memuat data peminjaman...</p>
-                    <style jsx>{`
-                        @keyframes spin {
-                            0% { transform: rotate(0deg); }
-                            100% { transform: rotate(360deg); }
-                        }
-                    `}</style>
-                </div>
-            </div>
-        );
+        return <SiswaSkeleton variant="peminjaman" />;
     }
 
     return (

@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 import { booksApi, statsApi, categoriesApi, loansApi, favoritesApi } from "@/lib/api";
 
 import type { Book, Category, SiswaStats } from "@/types";
+import SiswaSkeleton from "@/components/SiswaSkeleton";
 
 // Category icons
 const categoryIcons: Record<string, React.ReactNode> = {
@@ -108,11 +109,7 @@ export default function SiswaDashboard() {
     };
 
     if (authLoading || isLoading) {
-        return (
-            <div className="dashboard-content" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}>
-                <p>Memuat...</p>
-            </div>
-        );
+        return <SiswaSkeleton variant="dashboard" />;
     }
 
     return (

@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { booksApi, categoriesApi } from "@/lib/api";
 import type { Book, Category } from "@/types";
+import SiswaSkeleton from "@/components/SiswaSkeleton";
 
 // Cover gradients for books without covers
 const coverGradients = [
@@ -97,11 +98,7 @@ function KatalogContent() {
     }, [debouncedSearch, selectedCategory, isAuthenticated]);
 
     if (authLoading) {
-        return (
-            <div className="dashboard-content" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "50vh" }}>
-                <p>Memuat...</p>
-            </div>
-        );
+        return <SiswaSkeleton variant="katalog" />;
     }
 
     return (
@@ -195,11 +192,7 @@ function KatalogContent() {
 
 export default function KatalogPage() {
     return (
-        <Suspense fallback={
-            <div className="katalog-page">
-                <p style={{ padding: '2rem', textAlign: 'center' }}>Memuat katalog...</p>
-            </div>
-        }>
+        <Suspense fallback={<SiswaSkeleton variant="katalog" />}>
             <KatalogContent />
         </Suspense>
     );
