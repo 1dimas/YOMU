@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { authApi, messagesApi } from "@/lib/api";
+import { authApi } from "@/lib/api";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Role } from "@/types";
@@ -11,9 +12,10 @@ import type { Conversation } from "@/types";
 interface HeaderProps {
     userName?: string;
     userClass?: string;
+    userRole?: Role;
 }
 
-export default function Header({ userName, userClass }: HeaderProps) {
+export default function Header({ userName, userClass, userRole }: HeaderProps) {
     const { user, refreshUser } = useAuth();
     const router = useRouter();
     const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -26,17 +28,20 @@ export default function Header({ userName, userClass }: HeaderProps) {
 
     // Notification Bell State
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-    const [conversations, setConversations] = useState<Conversation[]>([]);
-    const [unreadCount, setUnreadCount] = useState(0);
-    const [isLoadingNotifications, setIsLoadingNotifications] = useState(false);
-    const notificationRef = useRef<HTMLDivElement>(null);
-    const prevUnreadCountRef = useRef<number>(0);
-    const isFirstLoadRef = useRef<boolean>(true);
+    const notifications = [
+        { id: 1, title: "Buku Dikembalikan", message: "Buku 'Laskar Pelangi' berhasil dikembalikan.", time: "2 jam lalu", read: false },
+        { id: 2, title: "Peminjaman Disetujui", message: "Peminjaman 'Bumi Manusia' telah disetujui.", time: "1 hari lalu", read: true },
+        { id: 3, title: "Pengingat", message: "Jangan lupa kembalikan buku tepat waktu.", time: "2 hari lalu", read: true },
+    ];
+    const unreadCount = notifications.filter(n => !n.read).length;
 
-    // Use auth context user data if available, fallback to props
-    const displayName = user?.name || userName || "User";
-    const displayClass = user?.class?.name || user?.major?.name || userClass || "Siswa";
+    // Search State
+    const [searchQuery, setSearchQuery] = useState("");
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
 
+    // Initial Display Data
+    const displayName = user?.name || userName || "Guest";
+    const displayClass = user?.class?.name || userClass || (user?.role === "ADMIN" ? "Administrator" : "Siswa");
     const initials = displayName
         .split(" ")
         .map((n) => n[0])
@@ -83,307 +88,144 @@ export default function Header({ userName, userClass }: HeaderProps) {
     };
 
     // Notification helpers
-    const getInitials = (name: string) => {
-        return name
-            .split(" ")
-            .map((n) => n[0])
-            .join("")
-            .toUpperCase()
-            .slice(0, 2);
-    };
+    const toggleNotification = () => setIsNotificationOpen(!isNotificationOpen);
 
-    const formatTimeAgo = (dateString: string) => {
-        const date = new Date(dateString);
-        const now = new Date();
-        const diffMs = now.getTime() - date.getTime();
-        const diffMins = Math.floor(diffMs / 60000);
-        const diffHours = Math.floor(diffMins / 60);
-        const diffDays = Math.floor(diffHours / 24);
-
-        if (diffMins < 1) return "Baru saja";
-        if (diffMins < 60) return `${diffMins}m`;
-        if (diffHours < 24) return `${diffHours}h`;
-        if (diffDays < 7) return `${diffDays}d`;
-        return date.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
-    };
-
-    // Fetch conversations for notifications
-    useEffect(() => {
-        const fetchConversations = async () => {
-            if (!user || user.role !== Role.SISWA) return;
-
-            try {
-                setIsLoadingNotifications(true);
-                const response = await messagesApi.getConversations();
-                const allConversations = response.data || [];
-
-                // Sort by lastMessageAt descending and take top 3
-                const sortedConversations = allConversations.sort((a, b) => {
-                    const dateA = new Date(a.lastMessageAt || 0).getTime();
-                    const dateB = new Date(b.lastMessageAt || 0).getTime();
-                    return dateB - dateA;
-                });
-
-                setConversations(sortedConversations.slice(0, 3));
-
-                // Count total unread messages
-                const totalUnread = allConversations.reduce((sum, conv) => sum + (conv.unreadCount || 0), 0);
-                setUnreadCount(totalUnread);
-
-                // Show toast notification if new messages arrived (skip first load)
-                if (!isFirstLoadRef.current && totalUnread > prevUnreadCountRef.current) {
-                    const newMessages = totalUnread - prevUnreadCountRef.current;
-                    const latestConv = sortedConversations.find(c => (c.unreadCount || 0) > 0);
-                    const senderName = latestConv?.otherUser?.name || 'Admin';
-                    toast.info(
-                        `📩 ${newMessages} pesan baru dari ${senderName}`,
-                        { duration: 5000 }
-                    );
-                }
-                prevUnreadCountRef.current = totalUnread;
-                isFirstLoadRef.current = false;
-            } catch (error) {
-                console.error("Failed to fetch conversations:", error);
-            } finally {
-                setIsLoadingNotifications(false);
-            }
-        };
-
-        fetchConversations();
-        // Refresh every 10 seconds for faster notification
-        const interval = setInterval(fetchConversations, 10000);
-        return () => clearInterval(interval);
-    }, [user]);
-
-    // Click outside handler for notification popover
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
-                setIsNotificationOpen(false);
-            }
-        };
-
-        if (isNotificationOpen) {
-            document.addEventListener("mousedown", handleClickOutside);
+    // Search handler
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            router.push(`/siswa/katalog?search=${encodeURIComponent(searchQuery)}`);
         }
+    };
 
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [isNotificationOpen]);
 
     return (
         <>
             <header className="top-header">
-                {/* Notification Bell - Only for SISWA role */}
-                {user?.role === Role.SISWA && (
-                    <div ref={notificationRef} style={{ position: "relative", marginRight: "1.5rem" }}>
+                {/* Search Bar - Hidden on Mobile, specific style */}
+                <form onSubmit={handleSearch} className={`search-bar ${isSearchFocused ? 'focused' : ''}`}>
+                    <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <input
+                        type="text"
+                        placeholder="Cari buku, kategori, atau penulis..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onFocus={() => setIsSearchFocused(true)}
+                        onBlur={() => setIsSearchFocused(false)}
+                    />
+                    {searchQuery && (
                         <button
-                            onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-                            style={{
-                                position: "relative",
-                                background: "transparent",
-                                border: "none",
-                                cursor: "pointer",
-                                padding: "0.5rem",
-                                borderRadius: "50%",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                transition: "background-color 0.2s",
-                            }}
-                            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f3f4f6")}
-                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+                            type="button"
+                            className="search-clear"
+                            onClick={() => setSearchQuery("")}
                         >
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="22" height="22">
-                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
                             </svg>
-                            {unreadCount > 0 && (
-                                <span
-                                    style={{
-                                        position: "absolute",
-                                        top: "4px",
-                                        right: "4px",
-                                        background: "#0084ff",
-                                        color: "white",
-                                        borderRadius: "50%",
-                                        width: unreadCount > 9 ? "20px" : "18px",
-                                        height: unreadCount > 9 ? "20px" : "18px",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        fontSize: "10px",
-                                        fontWeight: "700",
-                                        border: "2px solid white",
-                                    }}
-                                >
-                                    {unreadCount > 9 ? "9+" : unreadCount}
-                                </span>
-                            )}
                         </button>
+                    )}
+                </form>
 
-                        {/* Notification Popover */}
-                        {isNotificationOpen && (
-                            <div
-                                style={{
-                                    position: "absolute",
-                                    right: 0,
-                                    top: "calc(100% + 8px)",
-                                    width: "360px",
-                                    background: "white",
-                                    borderRadius: "12px",
-                                    boxShadow: "0 10px 40px rgba(0, 0, 0, 0.15)",
-                                    zIndex: 1000,
-                                    overflow: "hidden",
-                                    border: "1px solid #e5e7eb",
-                                }}
-                            >
-                                {/* Popover Header */}
-                                <div style={{ padding: "1rem 1.25rem", borderBottom: "1px solid #e5e7eb", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                                    <h3 style={{ margin: 0, fontSize: "16px", fontWeight: "700", color: "#111827" }}>Pesan</h3>
-                                    {unreadCount > 0 && (
-                                        <span
-                                            style={{
-                                                background: "#e7f3ff",
-                                                color: "#0084ff",
-                                                padding: "0.25rem 0.5rem",
-                                                borderRadius: "12px",
-                                                fontSize: "12px",
-                                                fontWeight: "600",
-                                            }}
-                                        >
-                                            {unreadCount} baru
-                                        </span>
-                                    )}
-                                </div>
-
-                                {/* Popover Content */}
-                                <div style={{ maxHeight: "320px", overflowY: "auto" }}>
-                                    {isLoadingNotifications ? (
-                                        <div style={{ padding: "2rem", textAlign: "center", color: "#9ca3af" }}>
-                                            <div style={{ marginBottom: "0.5rem" }}>⏳</div>
-                                            <div style={{ fontSize: "14px" }}>Memuat pesan...</div>
-                                        </div>
-                                    ) : conversations.length === 0 ? (
-                                        <div style={{ padding: "2rem", textAlign: "center", color: "#9ca3af" }}>
-                                            <div style={{ fontSize: "40px", marginBottom: "0.5rem" }}>💬</div>
-                                            <div style={{ fontSize: "14px", fontWeight: "500", color: "#6b7280" }}>Belum ada pesan</div>
-                                            <div style={{ fontSize: "12px", marginTop: "0.25rem" }}>Pesan dari admin akan muncul di sini</div>
-                                        </div>
-                                    ) : (
-                                        conversations.map((conv) => {
-                                            const otherUser = conv.otherUser;
-                                            const isUnread = (conv.unreadCount || 0) > 0;
-                                            return (
-                                                <div
-                                                    key={conv.id}
-                                                    style={{
-                                                        padding: "0.75rem 1.25rem",
-                                                        borderBottom: "1px solid #f3f4f6",
-                                                        cursor: "pointer",
-                                                        transition: "background-color 0.15s",
-                                                        backgroundColor: isUnread ? "#f8fbff" : "white",
-                                                    }}
-                                                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f9fafb")}
-                                                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = isUnread ? "#f8fbff" : "white")}
-                                                    onClick={() => {
-                                                        setIsNotificationOpen(false);
-                                                        router.push("/siswa/pesan");
-                                                    }}
-                                                >
-                                                    <div style={{ display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
-                                                        <div
-                                                            style={{
-                                                                width: "40px",
-                                                                height: "40px",
-                                                                borderRadius: "50%",
-                                                                background: "linear-gradient(135deg, #e4e6eb 0%, #d0d3d9 100%)",
-                                                                display: "flex",
-                                                                alignItems: "center",
-                                                                justifyContent: "center",
-                                                                fontSize: "14px",
-                                                                fontWeight: "600",
-                                                                color: "#65676b",
-                                                                flexShrink: 0,
-                                                            }}
-                                                        >
-                                                            {getInitials(otherUser?.name || "Admin")}
-                                                        </div>
-                                                        <div style={{ flex: 1, minWidth: 0 }}>
-                                                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "0.25rem" }}>
-                                                                <span style={{ fontSize: "14px", fontWeight: isUnread ? "600" : "500", color: "#111827", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                                                    {otherUser?.name || "User"}
-                                                                </span>
-                                                                <span style={{ fontSize: "11px", color: "#9ca3af", marginLeft: "0.5rem", flexShrink: 0 }}>
-                                                                    {formatTimeAgo(conv.lastMessageAt || conv.createdAt || '')}
-                                                                </span>
-                                                            </div>
-                                                            <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
-                                                                <p
-                                                                    style={{
-                                                                        margin: 0,
-                                                                        fontSize: "13px",
-                                                                        color: isUnread ? "#374151" : "#6b7280",
-                                                                        overflow: "hidden",
-                                                                        textOverflow: "ellipsis",
-                                                                        whiteSpace: "nowrap",
-                                                                        fontWeight: isUnread ? "500" : "400",
-                                                                    }}
-                                                                >
-                                                                    {conv.lastMessage?.content || "Belum ada pesan"}
-                                                                </p>
-                                                                {isUnread && (
-                                                                    <div
-                                                                        style={{
-                                                                            width: "8px",
-                                                                            height: "8px",
-                                                                            borderRadius: "50%",
-                                                                            background: "#0084ff",
-                                                                            flexShrink: 0,
-                                                                        }}
-                                                                    />
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })
-                                    )}
-                                </div>
-
-                                {/* Popover Footer */}
-                                {conversations.length > 0 && (
-                                    <div style={{ padding: "0.75rem 1.25rem", borderTop: "1px solid #e5e7eb", background: "#fafafa" }}>
-                                        <button
-                                            onClick={() => {
-                                                setIsNotificationOpen(false);
-                                                router.push("/siswa/pesan");
-                                            }}
-                                            style={{
-                                                width: "100%",
-                                                padding: "0.625rem",
-                                                background: "#0084ff",
-                                                color: "white",
-                                                border: "none",
-                                                borderRadius: "8px",
-                                                fontSize: "14px",
-                                                fontWeight: "600",
-                                                cursor: "pointer",
-                                                transition: "background-color 0.2s",
-                                            }}
-                                            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#0073e6")}
-                                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#0084ff")}
-                                        >
-                                            Buka Semua Pesan
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
+                {/* Notification Bell */}
+                <div className="notification-wrapper" style={{ position: 'relative', marginRight: '1rem' }}>
+                    <button
+                        className="notification-btn"
+                        onClick={toggleNotification}
+                        title="Notifikasi"
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            color: '#64748b',
+                            padding: '0.5rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}
+                    >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                        </svg>
+                        {unreadCount > 0 && (
+                            <span style={{
+                                position: 'absolute',
+                                top: '0',
+                                right: '0',
+                                background: '#ef4444',
+                                color: 'white',
+                                fontSize: '0.7rem',
+                                width: '16px',
+                                height: '16px',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontWeight: 'bold'
+                            }}>{unreadCount}</span>
                         )}
-                    </div>
-                )}
+                    </button>
+
+                    {/* Dropdown Notifikasi */}
+                    {isNotificationOpen && (
+                        <div className="notification-dropdown" style={{
+                            position: 'absolute',
+                            top: '120%',
+                            right: 0,
+                            width: '320px',
+                            background: 'white',
+                            borderRadius: '1rem',
+                            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+                            border: '1px solid #f1f5f9',
+                            zIndex: 100,
+                            overflow: 'hidden'
+                        }}>
+                            <div className="notification-header" style={{
+                                padding: '1rem',
+                                borderBottom: '1px solid #f1f5f9',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center'
+                            }}>
+                                <h3 style={{ fontSize: '0.95rem', fontWeight: 600, margin: 0 }}>Notifikasi</h3>
+                                <button className="mark-read-btn" style={{ fontSize: '0.75rem', color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer' }}>Tandai semua dibaca</button>
+                            </div>
+                            <div className="notification-list" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                                {notifications.map((notif) => (
+                                    <div key={notif.id} className={`notification-item ${!notif.read ? 'unread' : ''}`} style={{
+                                        padding: '1rem',
+                                        borderBottom: '1px solid #f1f5f9',
+                                        display: 'flex',
+                                        gap: '0.75rem',
+                                        background: !notif.read ? '#f8fafc' : 'white'
+                                    }}>
+                                        <div className="notif-icon" style={{ flexShrink: 0 }}>
+                                            {notif.title.includes("Dikembalikan") ? (
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" width="20" height="20"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
+                                            ) : notif.title.includes("Disetujui") ? (
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" width="20" height="20"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" /></svg>
+                                            ) : (
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" width="20" height="20"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+                                            )}
+                                        </div>
+                                        <div className="notif-content">
+                                            <h4 style={{ fontSize: '0.85rem', fontWeight: 600, margin: '0 0 0.25rem' }}>{notif.title}</h4>
+                                            <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 0.25rem' }}>{notif.message}</p>
+                                            <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>{notif.time}</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="notification-footer" style={{ padding: '0.75rem', textAlign: 'center', borderTop: '1px solid #f1f5f9' }}>
+                                <button style={{ fontSize: '0.8rem', color: '#3b82f6', background: 'none', border: 'none', fontWeight: 500, cursor: 'pointer' }}>Lihat Semua Notifikasi</button>
+                            </div>
+                        </div>
+                    )}
+                </div>
 
                 <div className="user-profile" onClick={handleOpenProfile} style={{ cursor: "pointer" }}>
                     <div className="user-info">
@@ -394,7 +236,7 @@ export default function Header({ userName, userClass }: HeaderProps) {
                         {user?.avatarUrl ? (
                             <img src={user.avatarUrl} alt={displayName} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
                         ) : (
-                            initials
+                            <span>{initials}</span>
                         )}
                     </div>
                 </div>
@@ -415,6 +257,7 @@ export default function Header({ userName, userClass }: HeaderProps) {
                                 padding: "2rem",
                                 textAlign: "center",
                                 color: "white",
+                                position: 'relative'
                             }}
                         >
                             <div
@@ -431,13 +274,14 @@ export default function Header({ userName, userClass }: HeaderProps) {
                                     fontSize: "1.75rem",
                                     fontWeight: "700",
                                     border: "3px solid rgba(255,255,255,0.3)",
+                                    overflow: 'hidden'
                                 }}
                             >
                                 {user?.avatarUrl ? (
                                     <img
                                         src={user.avatarUrl}
                                         alt={displayName}
-                                        style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }}
+                                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
                                     />
                                 ) : (
                                     initials

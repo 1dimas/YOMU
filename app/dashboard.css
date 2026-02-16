@@ -87,23 +87,12 @@
     color: white;
 }
 
-.sidebar-nav-item.pink-active {
-    background: #f472b6;
-    color: white;
-}
+
 
 .sidebar-nav-item .nav-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.sidebar-nav-item .nav-icon.pink-icon svg {
-    color: #f472b6;
-}
-
-.sidebar-nav-item.pink-active .nav-icon.pink-icon svg {
-    color: white;
 }
 
 .sidebar-nav-item svg {
@@ -113,85 +102,153 @@
     flex-shrink: 0;
 }
 
-/* Green Active State (Pesan) */
-.sidebar-nav-item.green-active {
-    background: rgba(16, 185, 129, 0.1);
-    color: #10b981;
-}
-
-.sidebar-nav-item.green-active .nav-icon svg {
-    color: #10b981;
-}
-
-.sidebar-nav-item.green-active .badge {
-    background: #10b981;
-    color: white;
-}
-
 /* Tipe Buku */
-.sidebar-tipe {
-    padding: 0 1.5rem;
+/* Sidebar Categories */
+.sidebar-category-group {
+    padding: 0 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
 }
 
-.tipe-item {
+.sidebar-category-item {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 0.5rem 0;
+    min-height: 44px;
+    padding: 0.5rem 1rem;
     color: #94a3b8;
     font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 0.75rem;
     cursor: pointer;
-    transition: color 0.2s;
+    transition: background-color 0.2s, color 0.2s, transform 0.12s ease-out;
+    position: relative;
+    /* Truncate text */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    /* Required for text-overflow to work with max-width */
 }
 
-.tipe-item:hover {
+.sidebar-category-item:hover {
+    background-color: rgba(59, 130, 246, 0.12);
     color: white;
 }
 
-.tipe-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
+.popular-category-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--foreground);
+    text-align: center;
+    /* Truncate to 2 lines */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100px;
+    /* Constrain width to force wrap/truncation */
+    line-height: 1.2;
 }
 
-.tipe-dot.fiksi {
-    background: #ef4444;
+.sidebar-category-item.active {
+    background-color: #2563eb;
+    color: white;
+    font-weight: 600;
 }
 
-.tipe-dot.non-fiksi {
-    background: #3b82f6;
+.sidebar-category-item:active {
+    transform: scale(0.98);
 }
 
-.tipe-dot.akademik {
-    background: #f59e0b;
+.sidebar-category-item:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
 }
 
-/* Sidebar Footer */
+/* Sidebar Footer Profile */
 .sidebar-footer {
     margin-top: auto;
-    padding: 0 1.5rem;
+    padding: 1.5rem 1rem;
 }
 
-.sidebar-logout {
+.sidebar-profile-card {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    color: #94a3b8;
-    font-size: 0.9rem;
-    cursor: pointer;
-    padding: 0.75rem 0;
-    transition: color 0.2s;
-    background: none;
-    border: none;
-    width: 100%;
-    text-align: left;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.sidebar-logout:hover {
+.sidebar-profile-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    flex-shrink: 0;
+    overflow: hidden;
 }
 
-.sidebar-logout svg {
+.sidebar-profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sidebar-profile-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    /* Enable truncation */
+}
+
+.sidebar-profile-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-profile-role {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+.sidebar-profile-logout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    color: #94a3b8;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.sidebar-profile-logout:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.sidebar-profile-logout svg {
     width: 18px;
     height: 18px;
 }
@@ -204,83 +261,119 @@
     min-height: 100vh;
 }
 
-/* Top Header */
+/* Top Header - Premium Glassmorphism */
 .top-header {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding: 1rem 2rem;
-    background: white;
-    border-bottom: 1px solid var(--border);
+    padding: 1rem 2.5rem;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.6);
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 50;
+    transition: all 0.3s ease;
+    height: 80px;
 }
 
 .search-bar {
     position: relative;
     flex: 1;
-    max-width: 500px;
+    max-width: 480px;
+    margin-right: auto;
+    /* Push to left if needed, or keep centered/right based on flex */
 }
 
 .search-bar input {
     width: 100%;
-    padding: 0.75rem 1rem 0.75rem 2.75rem;
-    border: 1px solid var(--border);
-    border-radius: 0.5rem;
-    font-size: 0.9rem;
-    background: #f8fafc;
-    transition: all 0.2s;
+    padding: 0.85rem 1.5rem 0.85rem 3rem;
+    border: 1px solid transparent;
+    border-radius: 9999px;
+    /* Pill shape */
+    font-size: 0.95rem;
+    background: #f1f5f9;
+    color: var(--foreground);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) inset;
 }
 
 .search-bar input:focus {
     outline: none;
-    border-color: var(--primary);
     background: white;
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15), 0 0 0 2px rgba(59, 130, 246, 0.1);
+    transform: scale(1.01);
+}
+
+.search-bar input::placeholder {
+    color: #94a3b8;
 }
 
 .search-bar svg {
     position: absolute;
-    left: 1rem;
+    left: 1.25rem;
     top: 50%;
     transform: translateY(-50%);
-    width: 18px;
-    height: 18px;
-    color: var(--text-muted);
+    width: 20px;
+    height: 20px;
+    color: #94a3b8;
+    transition: color 0.2s;
+}
+
+.search-bar input:focus~svg {
+    color: var(--primary);
 }
 
 .user-profile {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 1rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.user-profile:hover {
+    background: white;
+    border-color: var(--border);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
 }
 
 .user-info {
     text-align: right;
+    line-height: 1.3;
 }
 
 .user-name {
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: var(--foreground);
 }
 
 .user-role {
     font-size: 0.75rem;
     color: var(--text-muted);
+    font-weight: 500;
 }
 
 .user-avatar {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+    border: 2px solid white;
 }
 
 /* Dashboard Content */
@@ -304,134 +397,233 @@
     color: var(--text-muted);
 }
 
-/* Stats Row */
-.stats-row {
-    display: flex;
+/* Dashboard Stats Grid */
+.dashboard-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.stats-section {
-    flex: 1;
-}
-
-.stats-cards {
-    display: flex;
-    gap: 1rem;
+    margin-bottom: 2.5rem;
 }
 
 .stat-card {
     background: white;
-    border-radius: 1rem;
-    padding: 1.25rem;
+    border-radius: 1.25rem;
+    padding: 1.5rem;
     display: flex;
-    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
     gap: 1rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    min-width: 200px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    min-height: 160px;
 }
 
-.stat-icon {
+.stat-card.categories-card {
+    justify-content: flex-start;
+}
+
+.stat-icon-wrapper {
     width: 48px;
     height: 48px;
-    border-radius: 0.75rem;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-bottom: 0.5rem;
 }
 
-.stat-icon.primary {
+.stat-icon-wrapper.blue {
     background: #dbeafe;
     color: #2563eb;
 }
 
-.stat-icon.warning {
-    background: #fef3c7;
-    color: #d97706;
+.stat-icon-wrapper.orange {
+    background: #ffedd5;
+    color: #f97316;
 }
 
-.stat-icon svg {
+.stat-icon-wrapper svg {
     width: 24px;
     height: 24px;
 }
 
-.stat-info h3 {
-    font-size: 1.75rem;
+.stat-value {
+    font-size: 2.25rem;
     font-weight: 700;
     color: var(--foreground);
     line-height: 1;
     margin-bottom: 0.25rem;
 }
 
-.stat-info p {
-    font-size: 0.8rem;
+.stat-label {
+    font-size: 0.9rem;
     color: var(--text-muted);
-    line-height: 1.3;
 }
 
-/* Kategori Populer */
-.kategori-section {
-    flex: 0 0 auto;
-}
-
-.kategori-title {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--text-muted);
+/* Popular Categories Card */
+.card-header {
     margin-bottom: 1rem;
 }
 
-.kategori-list {
-    display: flex;
-    gap: 1rem;
+.card-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
 }
 
-.kategori-item {
+.popular-categories-list {
+    display: flex;
+    justify-content: space-around;
+    /* Center items with space */
+    align-items: flex-start;
+    /* Align to top so icons match */
+    height: 100%;
+    padding-top: 0.5rem;
+    /* Optical balance */
+}
+
+.popular-category-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-}
-
-.kategori-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    gap: 0.75rem;
+    text-decoration: none;
     transition: transform 0.2s;
 }
 
-.kategori-icon:hover {
-    transform: scale(1.05);
+.popular-category-item:hover {
+    transform: translateY(-2px);
 }
 
-.kategori-icon.fiksi {
-    background: #fee2e2;
-    color: #ef4444;
+.popular-category-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
 }
 
-.kategori-icon.non-fiksi {
-    background: #dbeafe;
-    color: #3b82f6;
+.popular-category-icon svg {
+    width: 28px;
+    height: 28px;
 }
 
-.kategori-icon.akademik {
-    background: #fef3c7;
-    color: #d97706;
-}
-
-.kategori-icon svg {
-    width: 24px;
-    height: 24px;
-}
-
-.kategori-item span {
-    font-size: 0.8rem;
+.popular-category-label {
+    font-size: 0.85rem;
+    font-weight: 500;
     color: var(--foreground);
+}
+
+/* Responsive Grid */
+@media (max-width: 1024px) {
+    .dashboard-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stat-card.categories-card {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 640px) {
+    .dashboard-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card.categories-card {
+        grid-column: span 1;
+    }
+}
+
+.kategori-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    border: 1px dashed var(--border);
+    border-radius: 0.75rem;
+}
+
+/* Accessibility & Breakpoints */
+@media (max-width: 768px) {
+    .kategori-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* ... existing code ... */
+
+/* Responsive Sidebar ("Secukupnya") */
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 80px;
+        padding: 1.5rem 0.5rem;
+    }
+
+    .main-content {
+        margin-left: 80px;
+    }
+
+    /* Hide Text */
+    .sidebar-logo-text,
+    .sidebar-section-title,
+    .sidebar-nav-item span:not(.nav-icon),
+    /* Hide text labels but keep icon span */
+    .sidebar-footer button {
+        display: none;
+        font-size: 0;
+        /* Fallback */
+    }
+
+    .sidebar-nav-item {
+        font-size: 0;
+        /* Ensure text nodes disappear */
+        justify-content: center;
+        padding: 0.75rem 0.5rem;
+    }
+
+    .sidebar-logo {
+        justify-content: center;
+        padding: 0;
+        margin-bottom: 2rem;
+    }
+
+    .sidebar-nav-item svg,
+    .sidebar-logo-icon,
+    .sidebar-logout svg {
+        margin: 0;
+    }
+
+    /* For Logout Button */
+    .sidebar-logout {
+        justify-content: center;
+        width: 100%;
+    }
+
+    /* Categories Section - Hide details, maybe show circular initials if possible,
+       or just hide the list to keep it clean as requested */
+    .sidebar-category-group,
+    .sidebar-section:has(.sidebar-category-group) .sidebar-section-title {
+        display: none;
+    }
+
+    /* Or nicer: Show a tooltip on hover? (Too complex for CSS only) */
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .sidebar-category-item,
+    .kategori-icon,
+    .kategori-item,
+    .book-card {
+        transition: none !important;
+        animation: none !important;
+        transform: none !important;
+    }
 }
 
 /* Book Section */
@@ -513,6 +705,11 @@
     font-weight: 600;
     color: var(--foreground);
     line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .book-favorite {

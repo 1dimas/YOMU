@@ -35,29 +35,38 @@ function SkeletonStatCard() {
     );
 }
 
-function SkeletonTableRow({ columns }: { columns: number }) {
+function SkeletonTableRow({ columns, rowIndex = 0 }: { columns: number; rowIndex?: number }) {
     return (
         <tr>
-            {Array.from({ length: columns }).map((_, i) => (
-                <td key={i} style={{ padding: "1rem 0.75rem" }}>
-                    {i === 1 ? (
-                        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                            <SkeletonBox width="32px" height="32px" borderRadius="50%" />
-                            <SkeletonBox width="70%" height="0.875rem" />
-                        </div>
-                    ) : (
-                        <SkeletonBox
-                            width={i === 0 ? "60px" : i === columns - 1 ? "40px" : `${50 + Math.random() * 30}%`}
-                            height="0.875rem"
-                        />
-                    )}
-                </td>
-            ))}
+            {Array.from({ length: columns }).map((_, i) => {
+                // Use deterministic widths based on column index instead of Math.random()
+                const widths = [65, 45, 75, 55, 70, 60];
+                const width = widths[(rowIndex * columns + i) % widths.length];
+                
+                return (
+                    <td key={i} style={{ padding: "1rem 0.75rem" }}>
+                        {i === 1 ? (
+                            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                                <SkeletonBox width="32px" height="32px" borderRadius="50%" />
+                                <SkeletonBox width="70%" height="0.875rem" />
+                            </div>
+                        ) : (
+                            <SkeletonBox
+                                width={i === 0 ? "60px" : i === columns - 1 ? "40px" : `${width}%`}
+                                height="0.875rem"
+                            />
+                        )}
+                    </td>
+                );
+            })}
         </tr>
     );
 }
 
 function SkeletonTable({ columns, rows }: { columns: number; rows: number }) {
+    // Deterministic widths instead of Math.random() to prevent hydration mismatches
+    const headerWidths = [60, 48, 70, 65, 58, 62];
+    
     return (
         <div className="data-table-container" style={{ opacity: 1 }}>
             <table className="data-table">
@@ -65,14 +74,14 @@ function SkeletonTable({ columns, rows }: { columns: number; rows: number }) {
                     <tr>
                         {Array.from({ length: columns }).map((_, i) => (
                             <th key={i}>
-                                <SkeletonBox width={`${40 + Math.random() * 40}%`} height="0.625rem" style={{ opacity: 0.5 }} />
+                                <SkeletonBox width={`${headerWidths[i % headerWidths.length]}%`} height="0.625rem" style={{ opacity: 0.5 }} />
                             </th>
                         ))}
                     </tr>
                 </thead>
                 <tbody>
                     {Array.from({ length: rows }).map((_, i) => (
-                        <SkeletonTableRow key={i} columns={columns} />
+                        <SkeletonTableRow key={i} columns={columns} rowIndex={i} />
                     ))}
                 </tbody>
             </table>

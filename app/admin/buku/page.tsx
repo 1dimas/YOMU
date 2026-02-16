@@ -117,6 +117,15 @@ export default function DataBukuPage() {
         try {
             await booksApi.delete(confirmDeleteId);
             setBooks((prevBooks) => prevBooks.filter(b => b.id !== confirmDeleteId));
+            
+            // Refetch categories to update book counts
+            try {
+                const catRes = await categoriesApi.getAll();
+                setCategories(catRes.data || []);
+            } catch (error) {
+                console.error("Failed to refetch categories:", error);
+            }
+            
             toast.success("Buku berhasil dihapus");
         } catch (error) {
             toast.error(error instanceof Error ? error.message : "Gagal menghapus buku");

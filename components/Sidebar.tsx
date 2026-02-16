@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { useState, useEffect } from "react";
 import { categoriesApi } from "@/lib/api";
 import type { Category } from "@/types";
+import ProfileModal from "./ProfileModal";
 
 
 const menuItems = [
@@ -20,7 +21,6 @@ const menuItems = [
         ),
         label: "Dashboard",
         href: "/siswa",
-        color: "default",
     },
     {
         icon: (
@@ -30,7 +30,6 @@ const menuItems = [
         ),
         label: "Buku Favorit",
         href: "/siswa/favorit",
-        color: "pink",
     },
     {
         icon: (
@@ -41,7 +40,6 @@ const menuItems = [
         ),
         label: "Peminjaman",
         href: "/siswa/peminjaman",
-        color: "default",
     },
 ];
 
@@ -59,7 +57,8 @@ const categoryColors = [
 export default function Sidebar() {
     const pathname = usePathname();
     const router = useRouter();
-    const { logout } = useAuth();
+    const searchParams = useSearchParams();
+    const { user, logout } = useAuth();
     const [categories, setCategories] = useState<Category[]>([]);
 
     useEffect(() => {
@@ -94,8 +93,6 @@ export default function Sidebar() {
 
     const getActiveClassName = (item: typeof menuItems[0]) => {
         if (!isActive(item.href)) return "";
-        if (item.color === "pink") return "pink-active";
-        if (item.color === "green") return "green-active";
         return "active";
     };
 
@@ -122,11 +119,10 @@ export default function Sidebar() {
                             href={item.href}
                             className={`sidebar-nav-item ${getActiveClassName(item)}`}
                         >
-                            <span className={`nav-icon ${item.color === "pink" ? "pink-icon" : ""}`}>
+                            <span className="nav-icon">
                                 {item.icon}
                             </span>
                             {item.label}
-
                         </Link>
                     ))}
                 </nav>
@@ -135,26 +131,24 @@ export default function Sidebar() {
             {/* Kategori Buku */}
             <div className="sidebar-section">
                 <div className="sidebar-section-title">Kategori</div>
-                <div className="sidebar-tipe">
-                    {categories.slice(0, 6).map((cat, index) => (
-                        <Link
-                            key={cat.id}
-                            href={`/siswa/katalog?category=${cat.id}`}
-                            className="tipe-item"
-                            style={{ textDecoration: 'none', color: 'inherit', cursor: 'pointer' }}
-                        >
-                            <span
-                                className="tipe-dot"
-                                style={{ backgroundColor: cat.color || categoryColors[index % categoryColors.length] }}
-                            />
-                            {cat.name}
-                        </Link>
-                    ))}
+                <div className="sidebar-category-group">
+                    {categories.slice(0, 6).map((cat) => {
+                        const isCatActive = isActive(`/siswa/katalog`) && searchParams.get('category') === cat.id;
+                        return (
+                            <Link
+                                key={cat.id}
+                                href={`/siswa/katalog?category=${cat.id}`}
+                                className={`sidebar-category-item ${isCatActive ? 'active' : ''}`}
+                            >
+                                {cat.name}
+                            </Link>
+                        );
+                    })}
                     {categories.length > 6 && (
                         <Link
                             href="/siswa/katalog"
-                            className="tipe-item"
-                            style={{ textDecoration: 'none', color: '#6b7280', cursor: 'pointer', fontSize: '0.85rem' }}
+                            className="sidebar-category-item"
+                            style={{ fontStyle: 'italic', fontSize: '0.85rem' }}
                         >
                             Lihat semua...
                         </Link>
@@ -164,14 +158,26 @@ export default function Sidebar() {
 
             {/* Footer */}
             <div className="sidebar-footer">
-                <button className="sidebar-logout" onClick={handleLogout}>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                        <polyline points="16 17 21 12 16 7" />
-                        <line x1="21" y1="12" x2="9" y2="12" />
-                    </svg>
-                    Keluar
-                </button>
+                <div className="sidebar-profile-card">
+                    <div className="sidebar-profile-avatar">
+                        {user?.avatarUrl ? (
+                            <img src={user.avatarUrl} alt={user.name} />
+                        ) : (
+                            <span>{user?.name?.slice(0, 2).toUpperCase() || "US"}</span>
+                        )}
+                    </div>
+                    <div className="sidebar-profile-info">
+                        <span className="sidebar-profile-name">{user?.name || "User"}</span>
+                        <span className="sidebar-profile-role">{user?.role === "SISWA" ? "Siswa" : "Admin"}</span>
+                    </div>
+                    <button onClick={handleLogout} className="sidebar-profile-logout" title="Keluar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                    </button>
+                </div>
             </div>
 
         </aside>

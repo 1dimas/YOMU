@@ -30,27 +30,74 @@ export default function KelolaKategoriPage() {
     const [deleteTargetName, setDeleteTargetName] = useState("");
     const [isDeleting, setIsDeleting] = useState(false);
 
+    // Store last refetch time to avoid excessive refetching
+    const [lastRefetchTime, setLastRefetchTime] = useState<number>(0);
+
+    // Track if just returned from another page
+    const [justReturned, setJustReturned] = useState(false);
+
+    // Extract fetchCategories as standalone function
+    const fetchCategories = async (isInitial = false) => {
+        try {
+            const response = await categoriesApi.getAll();
+            setCategories(response.data || []);
+        } catch (error) {
+            console.error("Failed to fetch categories:", error);
+            // Show error toast only on manual/visibility refetch, not on initial load
+            if (!isInitial) {
+                toast.error("Gagal memperbarui data kategori");
+            }
+        } finally {
+            if (isInitial) {
+                setIsLoading(false);
+            }
+        }
+    };
+
+    // Initial fetch on auth state change
     useEffect(() => {
         if (!authLoading && (!isAuthenticated || user?.role !== 'ADMIN')) {
             router.push("/login");
             return;
         }
 
-        const fetchCategories = async () => {
-            try {
-                const response = await categoriesApi.getAll();
-                setCategories(response.data || []);
-            } catch (error) {
-                console.error("Failed to fetch categories:", error);
-            } finally {
-                setIsLoading(false);
+        if (isAuthenticated && user?.role === 'ADMIN') {
+            fetchCategories(true);
+        }
+    }, [isAuthenticated, authLoading, router, user?.role]);
+
+    // Auto-refetch when page becomes visible
+    useEffect(() => {
+        const handleVisibilityChange = async () => {
+            // Only refetch when page becomes visible
+            if (document.visibilityState === 'visible') {
+                const now = Date.now();
+                // Debounce: only refetch if at least 5 seconds have passed since last refetch
+                if (now - lastRefetchTime > 5000) {
+                    setLastRefetchTime(now);
+                    await fetchCategories(false);
+                }
             }
         };
 
-        if (isAuthenticated && user?.role === 'ADMIN') {
-            fetchCategories();
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, [lastRefetchTime]);
+
+    // Refetch when component mounts (in case user navigated back from another page)
+    useEffect(() => {
+        if (isAuthenticated && user?.role === 'ADMIN' && !isLoading && !justReturned) {
+            setJustReturned(true);
+            // Add slight delay to ensure backend has processed any deletions
+            const timer = setTimeout(() => {
+                fetchCategories(false);
+            }, 500);
+            return () => clearTimeout(timer);
         }
-    }, [isAuthenticated, authLoading, router, user?.role]);
+    }, [isAuthenticated, user?.role]);
 
     const handleTambahKategori = () => {
         setFormMode("add");
@@ -137,7 +184,7 @@ export default function KelolaKategoriPage() {
         return (
             <div className="admin-dashboard">
                 <AdminHeader title="Kategori Buku" subtitle="Kategori" />
-                <AdminSkeleton variant="table" columns={6} />
+                <AdminSkeleton variant="table" columns={5} />
             </div>
         );
     }
@@ -187,7 +234,6 @@ export default function KelolaKategoriPage() {
                         <thead>
                             <tr>
                                 <th style={{ width: "60px" }}>NO</th>
-                                <th>ID KATEGORI</th>
                                 <th>NAMA KATEGORI</th>
                                 <th>DESKRIPSI</th>
                                 <th>TOTAL BUKU</th>
@@ -198,7 +244,6 @@ export default function KelolaKategoriPage() {
                             {categories.length > 0 ? categories.map((kategori, index) => (
                                 <tr key={kategori.id}>
                                     <td className="text-center">{index + 1}</td>
-                                    <td className="id-cell">#{kategori.id.slice(-6).toUpperCase()}</td>
                                     <td className="title-cell">{kategori.name}</td>
                                     <td>{kategori.description || "-"}</td>
                                     <td>
@@ -223,7 +268,7 @@ export default function KelolaKategoriPage() {
                                 </tr>
                             )) : (
                                 <tr>
-                                    <td colSpan={6} style={{ textAlign: "center", padding: "2rem" }}>
+                                    <td colSpan={5} style={{ textAlign: "center", padding: "2rem" }}>
                                         Tidak ada data kategori
                                     </td>
                                 </tr>

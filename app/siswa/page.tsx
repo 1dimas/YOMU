@@ -120,68 +120,54 @@ export default function SiswaDashboard() {
                 <p>Mau baca apa hari ini?</p>
             </div>
 
-            {/* Stats Row */}
-            <div className="stats-row">
-                <div className="stats-section">
-                    <div className="stats-cards">
-                        {/* Buku Sedang Dipinjam */}
-                        <div className="stat-card">
-                            <div className="stat-icon primary">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                                </svg>
-                            </div>
-                            <div className="stat-info">
-                                <h3>{stats?.borrowedBooks || 0}</h3>
-                                <p>Buku Sedang Dipinjam</p>
-                            </div>
-                        </div>
-
-                        {/* Tenggat Kembali */}
-                        <div className="stat-card">
-                            <div className="stat-icon warning">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                                    <line x1="16" y1="2" x2="16" y2="6" />
-                                    <line x1="8" y1="2" x2="8" y2="6" />
-                                    <line x1="3" y1="10" x2="21" y2="10" />
-                                </svg>
-                            </div>
-                            <div className="stat-info">
-                                <h3>{formatDate(stats?.nearestDueDate)}</h3>
-                                <p>Tenggat Kembali Terdekat</p>
-                            </div>
-                        </div>
+            {/* Dashboard Stats Grid */}
+            <div className="dashboard-stats-grid">
+                {/* Buku Sedang Dipinjam */}
+                <div className="stat-card">
+                    <div className="stat-icon-wrapper blue">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                        </svg>
+                    </div>
+                    <div className="stat-content">
+                        <h3 className="stat-value">{stats?.borrowedBooks || 0}</h3>
+                        <p className="stat-label">Buku Sedang Dipinjam</p>
                     </div>
                 </div>
 
-                {/* Kategori Populer */}
-                <div className="kategori-section">
-                    <div className="kategori-title">Kategori Populer</div>
-                    <div className="kategori-list">
-                        {categories.length > 0 ? categories.slice(0, 3).map((cat) => (
-                            <Link key={cat.id} href={`/siswa/katalog?category=${cat.id}`} className="kategori-item">
-                                <div className={`kategori-icon`} style={{ backgroundColor: cat.color }}>
+                {/* Tenggat Kembali */}
+                <div className="stat-card">
+                    <div className="stat-icon-wrapper orange">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                            <line x1="16" y1="2" x2="16" y2="6" />
+                            <line x1="8" y1="2" x2="8" y2="6" />
+                            <line x1="3" y1="10" x2="21" y2="10" />
+                        </svg>
+                    </div>
+                    <div className="stat-content">
+                        <h3 className="stat-value">{stats?.nearestDueDate ? formatDate(stats.nearestDueDate) : "Tidak ada"}</h3>
+                        <p className="stat-label">Tenggat Kembali Terdekat</p>
+                    </div>
+                </div>
+
+                {/* Kategori Populer (Card) */}
+                <div className="stat-card categories-card">
+                    <div className="card-header">
+                        <span className="card-title">KATEGORI POPULER</span>
+                    </div>
+                    <div className="popular-categories-list">
+                        {categories.slice(0, 3).map((cat) => (
+                            <Link key={cat.id} href={`/siswa/katalog?category=${cat.id}`} className="popular-category-item">
+                                <div className="popular-category-icon" style={{ backgroundColor: `${cat.color}20`, color: cat.color }}>
                                     {categoryIcons[cat.name] || categoryIcons["Fiksi"]}
                                 </div>
-                                <span>{cat.name}</span>
+                                <span className="popular-category-label">{cat.name}</span>
                             </Link>
-                        )) : (
-                            <>
-                                <div className="kategori-item">
-                                    <div className="kategori-icon fiksi">{categoryIcons["Fiksi"]}</div>
-                                    <span>Fiksi</span>
-                                </div>
-                                <div className="kategori-item">
-                                    <div className="kategori-icon non-fiksi">{categoryIcons["Non-Fiksi"]}</div>
-                                    <span>Non-Fiksi</span>
-                                </div>
-                                <div className="kategori-item">
-                                    <div className="kategori-icon akademik">{categoryIcons["Akademik"]}</div>
-                                    <span>Akademik</span>
-                                </div>
-                            </>
+                        ))}
+                        {categories.length === 0 && (
+                            <div className="empty-categories">Belum ada kategori</div>
                         )}
                     </div>
                 </div>
