@@ -32,7 +32,7 @@ export default function KelolaKategoriPage() {
 
     // Store last refetch time to avoid excessive refetching
     const [lastRefetchTime, setLastRefetchTime] = useState<number>(0);
-
+    
     // Track if just returned from another page
     const [justReturned, setJustReturned] = useState(false);
 
@@ -184,7 +184,7 @@ export default function KelolaKategoriPage() {
         return (
             <div className="admin-dashboard">
                 <AdminHeader title="Kategori Buku" subtitle="Kategori" />
-                <AdminSkeleton variant="table" columns={5} />
+                <AdminSkeleton variant="table" columns={6} />
             </div>
         );
     }
@@ -234,6 +234,7 @@ export default function KelolaKategoriPage() {
                         <thead>
                             <tr>
                                 <th style={{ width: "60px" }}>NO</th>
+                                <th>ID KATEGORI</th>
                                 <th>NAMA KATEGORI</th>
                                 <th>DESKRIPSI</th>
                                 <th>TOTAL BUKU</th>
@@ -244,6 +245,7 @@ export default function KelolaKategoriPage() {
                             {categories.length > 0 ? categories.map((kategori, index) => (
                                 <tr key={kategori.id}>
                                     <td className="text-center">{index + 1}</td>
+                                    <td className="id-cell">#{kategori.id.slice(-6).toUpperCase()}</td>
                                     <td className="title-cell">{kategori.name}</td>
                                     <td>{kategori.description || "-"}</td>
                                     <td>
@@ -268,7 +270,7 @@ export default function KelolaKategoriPage() {
                                 </tr>
                             )) : (
                                 <tr>
-                                    <td colSpan={5} style={{ textAlign: "center", padding: "2rem" }}>
+                                    <td colSpan={6} style={{ textAlign: "center", padding: "2rem" }}>
                                         Tidak ada data kategori
                                     </td>
                                 </tr>

@@ -312,37 +312,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
                         </>
                     ) : (
                         <div style={{ display: "flex", gap: "0.75rem", width: "100%", justifyContent: "flex-end" }}>
-                            <button
-                                onClick={async () => {
-                                    try {
-                                        await logout();
-                                        window.location.href = "/login";
-                                    } catch (error) {
-                                        console.error("Logout failed:", error);
-                                    }
-                                }}
-                                style={{
-                                    padding: "0.75rem 1.25rem",
-                                    background: "#fee2e2",
-                                    color: "#ef4444",
-                                    border: "none",
-                                    borderRadius: "0.5rem",
-                                    fontSize: "0.95rem",
-                                    fontWeight: "600",
-                                    cursor: "pointer",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: "0.5rem",
-                                    marginRight: "auto"
-                                }}
-                            >
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
-                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                                    <polyline points="16 17 21 12 16 7" />
-                                    <line x1="21" y1="12" x2="9" y2="12" />
-                                </svg>
-                                Keluar
-                            </button>
+                           
 
                             <button
                                 onClick={handleStartEdit}

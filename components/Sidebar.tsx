@@ -151,13 +151,13 @@ export default function Sidebar() {
                             style={{ fontStyle: 'italic', fontSize: '0.85rem' }}
                         >
                             Lihat semua...
-                        </Link>
+                        </Link> 
                     )}
                 </div>
             </div>
 
             {/* Footer */}
-            <div className="sidebar-footer">
+            {/* <div className="sidebar-footer">
                 <div className="sidebar-profile-card">
                     <div className="sidebar-profile-avatar">
                         {user?.avatarUrl ? (
@@ -178,7 +178,7 @@ export default function Sidebar() {
                         </svg>
                     </button>
                 </div>
-            </div>
+            </div> */}
 
         </aside>
     );

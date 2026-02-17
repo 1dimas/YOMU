@@ -298,6 +298,12 @@ export const messagesApi = {
     getUnreadCount: async () => {
         return fetchApi<ApiResponse<{ count: number }>>('/messages/unread-count');
     },
+
+    markAllAsRead: async () => {
+        return fetchApi<ApiResponse<{ count: number }>>('/messages/read-all', {
+            method: 'PUT',
+        });
+    },
 };
 
 // ============ USERS API (Admin) ============
