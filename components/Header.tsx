@@ -16,8 +16,9 @@ interface HeaderProps {
 }
 
 export default function Header({ userName, userClass, userRole }: HeaderProps) {
-    const { user, refreshUser } = useAuth();
+    const { user, refreshUser, logout } = useAuth();
     const router = useRouter();
+    const pathname = usePathname();
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -106,6 +107,18 @@ export default function Header({ userName, userClass, userRole }: HeaderProps) {
         return () => clearInterval(intervalId);
     }, [user]);
 
+    // Lock body scroll when profile modal is open
+    useEffect(() => {
+        if (isProfileOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isProfileOpen]);
+
     // Search State
     const [searchQuery, setSearchQuery] = useState("");
     const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -173,32 +186,34 @@ export default function Header({ userName, userClass, userRole }: HeaderProps) {
         <>
             <header className="top-header">
                 {/* Search Bar - Hidden on Mobile, specific style */}
-                <form onSubmit={handleSearch} className={`search-bar ${isSearchFocused ? 'focused' : ''}`}>
-                    <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="11" cy="11" r="8" />
-                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                    </svg>
-                    <input
-                        type="text"
-                        placeholder="Cari buku, kategori, atau penulis..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        onFocus={() => setIsSearchFocused(true)}
-                        onBlur={() => setIsSearchFocused(false)}
-                    />
-                    {searchQuery && (
-                        <button
-                            type="button"
-                            className="search-clear"
-                            onClick={() => setSearchQuery("")}
-                        >
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <line x1="18" y1="6" x2="6" y2="18" />
-                                <line x1="6" y1="6" x2="18" y2="18" />
-                            </svg>
-                        </button>
-                    )}
-                </form>
+                {pathname !== '/siswa/katalog' && (
+                    <form onSubmit={handleSearch} className={`search-bar ${isSearchFocused ? 'focused' : ''}`}>
+                        <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                        <input
+                            type="text"
+                            placeholder="Cari buku, kategori, atau penulis..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onFocus={() => setIsSearchFocused(true)}
+                            onBlur={() => setIsSearchFocused(false)}
+                        />
+                        {searchQuery && (
+                            <button
+                                type="button"
+                                className="search-clear"
+                                onClick={() => setSearchQuery("")}
+                            >
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18" />
+                                    <line x1="6" y1="6" x2="18" y2="18" />
+                                </svg>
+                            </button>
+                        )}
+                    </form>
+                )}
 
                 {/* Notification Bell */}
                 <div className="notification-wrapper" style={{ position: 'relative', marginRight: '1rem' }}>
@@ -347,8 +362,7 @@ export default function Header({ userName, userClass, userRole }: HeaderProps) {
             {isProfileOpen && (
                 <div className="modal-overlay" onClick={() => setIsProfileOpen(false)}>
                     <div
-                        className="modal-content"
-                        style={{ maxWidth: "500px", borderRadius: "1rem", overflow: "hidden" }}
+                        className="modal-content profile-modal"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Modal Header with Gradient */}
@@ -579,33 +593,59 @@ export default function Header({ userName, userClass, userRole }: HeaderProps) {
                                     </button>
                                 </>
                             ) : (
-                                <button
-                                    onClick={() => setIsEditing(true)}
-                                    style={{
-                                        padding: "0.75rem 1.25rem",
-                                        background: "#10b981",
-                                        color: "white",
-                                        border: "none",
-                                        borderRadius: "0.5rem",
-                                        fontSize: "0.95rem",
-                                        fontWeight: "600",
-                                        cursor: "pointer",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: "0.5rem",
-                                    }}
-                                >
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
-                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                    </svg>
-                                    Edit Profil
-                                </button>
+                                <>
+                                    <button
+                                        onClick={logout}
+                                        style={{
+                                            padding: "0.75rem 1.25rem",
+                                            background: "#ef4444",
+                                            color: "white",
+                                            border: "none",
+                                            borderRadius: "0.5rem",
+                                            fontSize: "0.95rem",
+                                            fontWeight: "600",
+                                            cursor: "pointer",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "0.5rem",
+                                        }}
+                                    >
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
+                                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                            <polyline points="16 17 21 12 16 7" />
+                                            <line x1="21" y1="12" x2="9" y2="12" />
+                                        </svg>
+                                        Keluar
+                                    </button>
+                                    <button
+                                        onClick={() => setIsEditing(true)}
+                                        style={{
+                                            padding: "0.75rem 1.25rem",
+                                            background: "#10b981",
+                                            color: "white",
+                                            border: "none",
+                                            borderRadius: "0.5rem",
+                                            fontSize: "0.95rem",
+                                            fontWeight: "600",
+                                            cursor: "pointer",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "0.5rem",
+                                        }}
+                                    >
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                                        </svg>
+                                        Edit Profil
+                                    </button>
+                                </>
                             )}
                         </div>
-                    </div>
-                </div>
-            )}
+                    </div >
+                </div >
+            )
+            }
         </>
     );
 }

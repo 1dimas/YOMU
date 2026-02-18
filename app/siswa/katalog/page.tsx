@@ -26,16 +26,8 @@ function KatalogContent() {
     const [books, setBooks] = useState<Book[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState<string>("semua");
-
-    // Get initial category from URL
-    useEffect(() => {
-        const categoryParam = searchParams.get("category");
-        if (categoryParam) {
-            setSelectedCategory(categoryParam);
-        }
-    }, [searchParams]);
+    const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
+    const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.get("category") || "semua");
 
     // Auth check and fetch data
     useEffect(() => {

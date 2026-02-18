@@ -2449,6 +2449,60 @@
     padding: 2rem;
 }
 
+/* Profile Modal Specifics */
+.profile-modal {
+    background: white;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 1rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    animation: modal-pop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+@keyframes modal-pop {
+    0% {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@media (max-width: 640px) {
+    .modal-overlay {
+        padding: 0;
+        align-items: flex-end;
+        /* Bottom sheet alignment */
+    }
+
+    .profile-modal {
+        max-width: 100%;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        animation: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        max-height: 85vh;
+        /* Prevent taking full height */
+    }
+
+    @keyframes slide-up {
+        0% {
+            transform: translateY(100%);
+        }
+
+        100% {
+            transform: translateY(0);
+        }
+    }
+}
+
 .modal-content {
     background: white;
     border-radius: 1rem;

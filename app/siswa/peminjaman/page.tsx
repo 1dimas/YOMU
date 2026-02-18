@@ -136,13 +136,36 @@ export default function PeminjamanPage() {
     return (
         <div className="dashboard-content" style={{ paddingBottom: '4rem' }}>
             {/* Page Header */}
-            <div style={{ marginBottom: '2rem' }}>
-                <h1 style={{ fontSize: '1.875rem', fontWeight: '800', color: '#111827', marginBottom: '0.5rem', letterSpacing: '-0.025em' }}>
-                    Peminjaman Saya
-                </h1>
-                <p style={{ color: '#6b7280', fontSize: '1rem' }}>
-                    Kelola dan pantau status peminjaman buku perpustakaan.
-                </p>
+            <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                    <h1 style={{ fontSize: '1.875rem', fontWeight: '800', color: '#111827', marginBottom: '0.5rem', letterSpacing: '-0.025em' }}>
+                        Peminjaman Saya
+                    </h1>
+                    <p style={{ color: '#6b7280', fontSize: '1rem' }}>
+                        Kelola dan pantau status peminjaman buku perpustakaan.
+                    </p>
+                </div>
+                <Link
+                    href="/siswa/pesan"
+                    style={{
+                        padding: '0.5rem 1rem',
+                        background: '#3b82f6',
+                        color: 'white',
+                        borderRadius: '0.5rem',
+                        textDecoration: 'none',
+                        fontSize: '0.875rem',
+                        fontWeight: '600',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        marginTop: '0.5rem'
+                    }}
+                >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Pesan
+                </Link>
                 <style jsx global>{`
                     @keyframes spin {
                         0% { transform: rotate(0deg); }
