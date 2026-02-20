@@ -31,11 +31,12 @@ export default function LoginPage() {
         try {
             const loggedInUser = await login(formData.email, formData.password);
             toast.success("Login berhasil!");
-            // Redirect based on role
+            // Use full page navigation (not router.push) to ensure the cookie
+            // is fully committed to the browser before middleware runs
             if (loggedInUser.role === 'ADMIN') {
-                router.push("/admin");
+                window.location.href = "/admin";
             } else {
-                router.push("/siswa");
+                window.location.href = "/siswa";
             }
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : "Login gagal. Periksa kembali email dan password Anda.";

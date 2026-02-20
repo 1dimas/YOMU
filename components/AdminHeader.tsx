@@ -1,25 +1,164 @@
 "use client";
 
 import { useAuth } from "@/lib/auth-context";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { messagesApi, loansApi } from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 interface AdminHeaderProps {
     title: string;
     subtitle?: string;
 }
 
+interface NotifItem {
+    id: string;
+    title: string;
+    message: string;
+    time: string;
+    read: boolean;
+    type: "message" | "loan" | "return";
+    href: string;
+}
+
+function timeAgo(dateStr: string): string {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 1) return "Baru saja";
+    if (minutes < 60) return `${minutes} menit lalu`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} jam lalu`;
+    const days = Math.floor(hours / 24);
+    return `${days} hari lalu`;
+}
+
 export default function AdminHeader({ title, subtitle }: AdminHeaderProps) {
     const { user } = useAuth();
+    const router = useRouter();
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+    const [notifications, setNotifications] = useState<NotifItem[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
-    const notifications = [
-        { id: 1, title: "Buku Dikembalikan", message: "Buku 'Laskar Pelangi' berhasil dikembalikan.", time: "2 jam lalu", read: false },
-        { id: 2, title: "Peminjaman Disetujui", message: "Peminjaman 'Bumi Manusia' telah disetujui.", time: "1 hari lalu", read: true },
-        { id: 3, title: "Pengingat", message: "Jangan lupa kembalikan buku tepat waktu.", time: "2 hari lalu", read: true },
-    ];
     const unreadCount = notifications.filter(n => !n.read).length;
 
-    const toggleNotification = () => setIsNotificationOpen(!isNotificationOpen);
+    // Fetch real notifications: pending loans + unread messages
+    const fetchNotifications = async () => {
+        if (!user?.id) return; // Don't fetch if not authenticated yet
+        try {
+            const [loansRes, conversationsRes] = await Promise.all([
+                loansApi.getAll({ status: "PENDING" } as never),
+                messagesApi.getConversations(),
+            ]);
+
+            const notifs: NotifItem[] = [];
+
+            // Pending loan requests → notifikasi untuk admin
+            const pendingLoans = (loansRes.data || []).slice(0, 5);
+            for (const loan of pendingLoans) {
+                notifs.push({
+                    id: `loan-${loan.id}`,
+                    title: "Permintaan Peminjaman",
+                    message: `${loan.user?.name || "Siswa"} meminta pinjam "${loan.book?.title || "buku"}"`,
+                    time: timeAgo(loan.createdAt || loan.loanDate),
+                    read: false,
+                    type: "loan",
+                    href: "/admin/peminjaman",
+                });
+            }
+
+            // Unread messages from conversations
+            const conversations = (conversationsRes.data || []) as Array<{
+                id: string;
+                lastMessageAt: string;
+                participant1?: { name: string };
+                participant2?: { name: string };
+                lastMessage?: { content: string; isRead: boolean; senderId: string };
+            }>;
+
+            for (const conv of conversations.slice(0, 5)) {
+                const lastMsg = conv.lastMessage;
+                if (!lastMsg) continue;
+                // Only show if the last message was sent by the other person (not admin) and unread
+                if (lastMsg.senderId === user?.id) continue;
+                const otherUser = conv.participant1?.name !== user?.name
+                    ? conv.participant1?.name
+                    : conv.participant2?.name;
+                notifs.push({
+                    id: `msg-${conv.id}`,
+                    title: "Pesan Baru",
+                    message: `${otherUser || "Siswa"}: ${lastMsg.content.slice(0, 50)}${lastMsg.content.length > 50 ? "..." : ""}`,
+                    time: timeAgo(conv.lastMessageAt),
+                    read: lastMsg.isRead,
+                    type: "message",
+                    href: "/admin/pesan",
+                });
+            }
+
+            // Sort: unread first, then by time
+            notifs.sort((a, b) => {
+                if (a.read !== b.read) return a.read ? 1 : -1;
+                return 0;
+            });
+
+            setNotifications(notifs);
+        } catch (err) {
+            console.error("Failed to fetch admin notifications:", err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (!user?.id) return; // Wait until user is authenticated
+        fetchNotifications();
+        // Poll every 30 seconds
+        const interval = setInterval(fetchNotifications, 30000);
+        return () => clearInterval(interval);
+    }, [user?.id]);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+                setIsNotificationOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const handleMarkAllRead = async () => {
+        await messagesApi.markAllAsRead();
+        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    };
+
+    const handleNotifClick = (notif: NotifItem) => {
+        setIsNotificationOpen(false);
+        router.push(notif.href);
+    };
+
+    const getIcon = (type: NotifItem["type"]) => {
+        if (type === "message") {
+            return (
+                <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" width="20" height="20">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+            );
+        }
+        if (type === "loan") {
+            return (
+                <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" width="20" height="20">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                </svg>
+            );
+        }
+        return (
+            <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" width="20" height="20">
+                <polyline points="20 6 9 17 4 12" />
+            </svg>
+        );
+    };
 
     return (
         <header style={{
@@ -59,15 +198,12 @@ export default function AdminHeader({ title, subtitle }: AdminHeaderProps) {
             </div>
 
             {/* Right: Notifications + Profile */}
-            <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '1.5rem',
-            }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+
                 {/* Notification Bell */}
-                <div className="notification-wrapper" style={{ position: 'relative' }}>
+                <div ref={dropdownRef} className="notification-wrapper" style={{ position: 'relative' }}>
                     <button
-                        onClick={toggleNotification}
+                        onClick={() => setIsNotificationOpen(!isNotificationOpen)}
                         style={{
                             position: 'relative',
                             background: 'none',
@@ -91,70 +227,126 @@ export default function AdminHeader({ title, subtitle }: AdminHeaderProps) {
                         {unreadCount > 0 && (
                             <span style={{
                                 position: 'absolute',
-                                top: '6px',
-                                right: '6px',
-                                width: '8px',
-                                height: '8px',
+                                top: '4px',
+                                right: '4px',
+                                minWidth: '16px',
+                                height: '16px',
                                 background: '#ef4444',
-                                borderRadius: '50%',
+                                borderRadius: '999px',
                                 border: '2px solid white',
-                            }} />
+                                fontSize: '0.6rem',
+                                fontWeight: 700,
+                                color: 'white',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                padding: '0 2px',
+                            }}>
+                                {unreadCount > 9 ? "9+" : unreadCount}
+                            </span>
                         )}
                     </button>
 
-                    {/* Dropdown Notifikasi */}
+                    {/* Dropdown */}
                     {isNotificationOpen && (
                         <div className="notification-dropdown" style={{
                             position: 'absolute',
                             top: '120%',
                             right: 0,
-                            width: '320px',
+                            width: '340px',
                             background: 'white',
                             borderRadius: '1rem',
-                            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+                            boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
                             border: '1px solid #f1f5f9',
                             zIndex: 100,
-                            overflow: 'hidden'
+                            overflow: 'hidden',
                         }}>
-                            <div className="notification-header" style={{
+                            {/* Header */}
+                            <div style={{
                                 padding: '1rem',
                                 borderBottom: '1px solid #f1f5f9',
                                 display: 'flex',
                                 justifyContent: 'space-between',
-                                alignItems: 'center'
+                                alignItems: 'center',
                             }}>
-                                <h3 style={{ fontSize: '0.95rem', fontWeight: 600, margin: 0, color: '#1e293b' }}>Notifikasi</h3>
-                                <button className="mark-read-btn" style={{ fontSize: '0.75rem', color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer' }}>Tandai semua dibaca</button>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <h3 style={{ fontSize: '0.95rem', fontWeight: 600, margin: 0, color: '#1e293b' }}>Notifikasi</h3>
+                                    {unreadCount > 0 && (
+                                        <span style={{
+                                            background: '#ef4444',
+                                            color: 'white',
+                                            fontSize: '0.65rem',
+                                            fontWeight: 700,
+                                            borderRadius: '999px',
+                                            padding: '1px 6px',
+                                        }}>{unreadCount}</span>
+                                    )}
+                                </div>
+                                {unreadCount > 0 && (
+                                    <button onClick={handleMarkAllRead} style={{ fontSize: '0.75rem', color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }}>
+                                        Tandai semua dibaca
+                                    </button>
+                                )}
                             </div>
-                            <div className="notification-list" style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                                {notifications.map((notif) => (
-                                    <div key={notif.id} className={`notification-item ${!notif.read ? 'unread' : ''}`} style={{
-                                        padding: '1rem',
-                                        borderBottom: '1px solid #f1f5f9',
-                                        display: 'flex',
-                                        gap: '0.75rem',
-                                        background: !notif.read ? '#f8fafc' : 'white'
-                                    }}>
-                                        <div className="notif-icon" style={{ flexShrink: 0 }}>
-                                            {notif.title.includes("Dikembalikan") ? (
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" width="20" height="20"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
-                                            ) : notif.title.includes("Disetujui") ? (
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" width="20" height="20"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" /></svg>
-                                            ) : (
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" width="20" height="20"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
-                                            )}
-                                        </div>
-                                        <div className="notif-content">
-                                            <h4 style={{ fontSize: '0.85rem', fontWeight: 600, margin: '0 0 0.25rem', color: '#1e293b' }}>{notif.title}</h4>
-                                            <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 0.25rem' }}>{notif.message}</p>
-                                            <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>{notif.time}</span>
-                                        </div>
+
+                            {/* List */}
+                            <div style={{ maxHeight: '320px', overflowY: 'auto' }}>
+                                {isLoading ? (
+                                    <div style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem' }}>
+                                        Memuat...
                                     </div>
-                                ))}
+                                ) : notifications.length === 0 ? (
+                                    <div style={{ padding: '2rem', textAlign: 'center' }}>
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1.5" width="40" height="40" style={{ margin: '0 auto 0.75rem', display: 'block' }}>
+                                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                                            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                                        </svg>
+                                        <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: 0 }}>Tidak ada notifikasi</p>
+                                    </div>
+                                ) : (
+                                    notifications.map((notif) => (
+                                        <div
+                                            key={notif.id}
+                                            onClick={() => handleNotifClick(notif)}
+                                            style={{
+                                                padding: '0.875rem 1rem',
+                                                borderBottom: '1px solid #f1f5f9',
+                                                display: 'flex',
+                                                gap: '0.75rem',
+                                                background: !notif.read ? '#f0f9ff' : 'white',
+                                                cursor: 'pointer',
+                                                transition: 'background 0.15s',
+                                            }}
+                                            onMouseEnter={(e) => { e.currentTarget.style.background = '#f8fafc'; }}
+                                            onMouseLeave={(e) => { e.currentTarget.style.background = !notif.read ? '#f0f9ff' : 'white'; }}
+                                        >
+                                            <div style={{ flexShrink: 0, marginTop: '2px' }}>
+                                                {getIcon(notif.type)}
+                                            </div>
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
+                                                    <h4 style={{ fontSize: '0.85rem', fontWeight: 600, margin: '0 0 0.2rem', color: '#1e293b' }}>{notif.title}</h4>
+                                                    {!notif.read && <span style={{ width: '7px', height: '7px', background: '#3b82f6', borderRadius: '50%', flexShrink: 0, marginTop: '4px' }} />}
+                                                </div>
+                                                <p style={{ fontSize: '0.78rem', color: '#64748b', margin: '0 0 0.2rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{notif.message}</p>
+                                                <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>{notif.time}</span>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
                             </div>
-                            <div className="notification-footer" style={{ padding: '0.75rem', textAlign: 'center', borderTop: '1px solid #f1f5f9' }}>
-                                <button style={{ fontSize: '0.8rem', color: '#3b82f6', background: 'none', border: 'none', fontWeight: 500, cursor: 'pointer' }}>Lihat Semua Notifikasi</button>
-                            </div>
+
+                            {/* Footer */}
+                            {notifications.length > 0 && (
+                                <div style={{ padding: '0.75rem', textAlign: 'center', borderTop: '1px solid #f1f5f9' }}>
+                                    <button
+                                        onClick={() => { setIsNotificationOpen(false); router.push('/admin/peminjaman'); }}
+                                        style={{ fontSize: '0.8rem', color: '#3b82f6', background: 'none', border: 'none', fontWeight: 500, cursor: 'pointer' }}
+                                    >
+                                        Lihat Semua Peminjaman →
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -163,22 +355,12 @@ export default function AdminHeader({ title, subtitle }: AdminHeaderProps) {
                 <div style={{ width: '1px', height: '32px', background: '#e5e7eb' }} />
 
                 {/* Profile */}
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.75rem',
-                }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                     <div style={{ textAlign: 'right' }}>
-                        <div style={{
-                            fontWeight: 600,
-                            fontSize: '0.875rem',
-                            color: '#111827',
-                            lineHeight: 1.3,
-                        }}>{user?.name || 'Admin Perpus'}</div>
-                        <div style={{
-                            fontSize: '0.75rem',
-                            color: '#9ca3af',
-                        }}>Administrator</div>
+                        <div style={{ fontWeight: 600, fontSize: '0.875rem', color: '#111827', lineHeight: 1.3 }}>
+                            {user?.name || 'Admin Perpus'}
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: '#9ca3af' }}>Administrator</div>
                     </div>
                     <div style={{
                         width: '40px',
