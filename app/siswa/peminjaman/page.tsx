@@ -72,7 +72,11 @@ export default function PeminjamanPage() {
             const response = await loansApi.getMy({});
             setLoans(response.data || []);
             setShowReturnModal(null);
-            toast.success("Permintaan pengembalian berhasil! Menunggu verifikasi admin.");
+            if (selectedCondition === BookCondition.GOOD) {
+                toast.success("Buku berhasil dikembalikan!");
+            } else {
+                toast.success("Permintaan pengembalian dikirim. Menunggu verifikasi admin.");
+            }
         } catch (error) {
             toast.error(error instanceof Error ? error.message : "Gagal mengembalikan buku");
         } finally {
@@ -89,10 +93,11 @@ export default function PeminjamanPage() {
     };
 
     const getDaysRemaining = (dateStr: string) => {
-        const today = new Date();
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const dueDate = new Date(dateStr);
-        const diffTime = dueDate.getTime() - today.getTime();
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const dueDay = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
+        const diffDays = Math.round((dueDay.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
         return diffDays;
     };
 
@@ -457,58 +462,65 @@ export default function PeminjamanPage() {
 
                             {/* Dynamic Action Area */}
                             <div style={{ marginTop: 'auto', paddingTop: '0.5rem' }}>
-                                {loan.status === "BORROWED" && (
-                                    <>
-                                        <div style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            gap: '0.5rem',
-                                            marginBottom: '1rem',
-                                            padding: '0.5rem',
-                                            background: getDaysRemaining(loan.dueDate) <= 3 ? '#fffbeb' : '#f3f4f6',
-                                            borderRadius: '0.5rem',
-                                            color: getDaysRemaining(loan.dueDate) <= 3 ? '#b45309' : '#4b5563',
-                                            fontSize: '0.875rem',
-                                            fontWeight: '500'
-                                        }}>
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
-                                                <circle cx="12" cy="12" r="10" />
-                                                <polyline points="12 6 12 12 16 14" />
-                                            </svg>
-                                            {getDaysRemaining(loan.dueDate) > 0
-                                                ? `${getDaysRemaining(loan.dueDate)} hari lagi`
-                                                : "Jatuh tempo!"}
-                                        </div>
-                                        <button
-                                            onClick={() => setShowReturnModal(loan.id)}
-                                            style={{
-                                                width: '100%',
-                                                padding: '0.75rem',
-                                                background: '#2563eb',
-                                                color: 'white',
-                                                border: 'none',
-                                                borderRadius: '0.5rem',
-                                                fontWeight: '600',
-                                                cursor: 'pointer',
-                                                fontSize: '0.95rem',
-                                                transition: 'background 0.2s',
+                                {loan.status === "BORROWED" && (() => {
+                                    const daysLeft = getDaysRemaining(loan.dueDate);
+                                    const canReturn = daysLeft <= 0;
+
+                                    return (
+                                        <>
+                                            <div style={{
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
-                                                gap: '0.5rem'
-                                            }}
-                                            onMouseOver={(e) => e.currentTarget.style.background = '#1d4ed8'}
-                                            onMouseOut={(e) => e.currentTarget.style.background = '#2563eb'}
-                                        >
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
-                                                <path d="M9 14l-4-4 4-4" />
-                                                <path d="M5 10h11a4 4 0 1 1 0 8h-1" />
-                                            </svg>
-                                            Kembalikan Buku
-                                        </button>
-                                    </>
-                                )}
+                                                gap: '0.5rem',
+                                                marginBottom: '1rem',
+                                                padding: '0.5rem',
+                                                background: !canReturn ? (daysLeft <= 3 ? '#fffbeb' : '#f0f4ff') : '#ecfdf5',
+                                                borderRadius: '0.5rem',
+                                                color: !canReturn ? (daysLeft <= 3 ? '#b45309' : '#3b82f6') : '#059669',
+                                                fontSize: '0.875rem',
+                                                fontWeight: '500'
+                                            }}>
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+                                                    <circle cx="12" cy="12" r="10" />
+                                                    <polyline points="12 6 12 12 16 14" />
+                                                </svg>
+                                                {canReturn
+                                                    ? 'Sudah bisa dikembalikan'
+                                                    : `Bisa dikembalikan dalam ${daysLeft} hari`}
+                                            </div>
+                                            <button
+                                                onClick={() => canReturn && setShowReturnModal(loan.id)}
+                                                disabled={!canReturn}
+                                                style={{
+                                                    width: '100%',
+                                                    padding: '0.75rem',
+                                                    background: canReturn ? '#2563eb' : '#94a3b8',
+                                                    color: 'white',
+                                                    border: 'none',
+                                                    borderRadius: '0.5rem',
+                                                    fontWeight: '600',
+                                                    cursor: canReturn ? 'pointer' : 'not-allowed',
+                                                    fontSize: '0.95rem',
+                                                    transition: 'background 0.2s',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    gap: '0.5rem',
+                                                    opacity: canReturn ? 1 : 0.7
+                                                }}
+                                                onMouseOver={(e) => canReturn && (e.currentTarget.style.background = '#1d4ed8')}
+                                                onMouseOut={(e) => canReturn && (e.currentTarget.style.background = '#2563eb')}
+                                            >
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
+                                                    <path d="M9 14l-4-4 4-4" />
+                                                    <path d="M5 10h11a4 4 0 1 1 0 8h-1" />
+                                                </svg>
+                                                {canReturn ? 'Kembalikan Buku' : `Tunggu ${daysLeft} hari lagi`}
+                                            </button>
+                                        </>
+                                    );
+                                })()}
                                 {loan.status === "OVERDUE" && (
                                     <>
                                         <div style={{
@@ -708,93 +720,60 @@ export default function PeminjamanPage() {
                                 Kembalikan Buku
                             </h3>
                             <p style={{ color: '#6b7280', marginBottom: '2rem', textAlign: 'center', lineHeight: 1.6 }}>
-                                Mohon konfirmasi kondisi buku sebelum mengembalikan. Pastikan buku dalam keadaan baik.
+                                Pilih kondisi buku saat ini. Buku dalam kondisi baik akan langsung dikembalikan, sedangkan buku rusak atau hilang akan diverifikasi oleh admin.
                             </p>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
-                                <label style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '1rem',
-                                    padding: '1.25rem',
-                                    border: selectedCondition === BookCondition.GOOD ? '2px solid #10b981' : '1px solid #e5e7eb',
-                                    borderRadius: '1rem',
-                                    cursor: 'pointer',
-                                    background: selectedCondition === BookCondition.GOOD ? '#ecfdf5' : 'white',
-                                    transition: 'all 0.2s',
-                                    position: 'relative'
-                                }}>
-                                    <div style={{
-                                        width: '24px',
-                                        height: '24px',
-                                        borderRadius: '50%',
-                                        border: selectedCondition === BookCondition.GOOD ? '6px solid #10b981' : '2px solid #d1d5db',
-                                        background: 'white',
-                                        flexShrink: 0,
-                                        transition: 'all 0.2s'
-                                    }}></div>
-                                    <input
-                                        type="radio"
-                                        name="condition"
-                                        value={BookCondition.GOOD}
-                                        checked={selectedCondition === BookCondition.GOOD}
-                                        onChange={() => setSelectedCondition(BookCondition.GOOD)}
-                                        style={{ display: 'none' }}
-                                    />
-                                    <div>
-                                        <div style={{ fontWeight: '700', color: '#111827', marginBottom: '0.25rem' }}>Kondisi Bagus</div>
-                                        <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Buku utuh, bersih, dan tidak robek</div>
-                                    </div>
-                                    {selectedCondition === BookCondition.GOOD && (
-                                        <div style={{ position: 'absolute', right: '1.25rem', top: '50%', transform: 'translateY(-50%)' }}>
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3" width="20" height="20">
-                                                <polyline points="20 6 9 17 4 12" />
-                                            </svg>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2rem' }}>
+                                {[
+                                    { value: BookCondition.GOOD, label: 'Kondisi Baik', desc: 'Buku dalam keadaan utuh, bersih, dan layak dipinjamkan kembali.', color: '#10b981', bg: '#ecfdf5' },
+                                    { value: BookCondition.DAMAGED, label: 'Kondisi Rusak', desc: 'Buku mengalami kerusakan seperti halaman sobek, basah, atau kotor.', color: '#f59e0b', bg: '#fffbeb' },
+                                    { value: BookCondition.LOST, label: 'Buku Hilang', desc: 'Buku tidak dapat ditemukan atau hilang selama masa peminjaman.', color: '#ef4444', bg: '#fef2f2' },
+                                ].map(opt => (
+                                    <label
+                                        key={opt.value}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '1rem',
+                                            padding: '1.25rem',
+                                            border: selectedCondition === opt.value ? `2px solid ${opt.color}` : '1px solid #e5e7eb',
+                                            borderRadius: '1rem',
+                                            cursor: 'pointer',
+                                            background: selectedCondition === opt.value ? opt.bg : 'white',
+                                            transition: 'all 0.2s',
+                                            position: 'relative'
+                                        }}
+                                    >
+                                        <div style={{
+                                            width: '24px',
+                                            height: '24px',
+                                            borderRadius: '50%',
+                                            border: selectedCondition === opt.value ? `6px solid ${opt.color}` : '2px solid #d1d5db',
+                                            background: 'white',
+                                            flexShrink: 0,
+                                            transition: 'all 0.2s'
+                                        }}></div>
+                                        <input
+                                            type="radio"
+                                            name="condition"
+                                            value={opt.value}
+                                            checked={selectedCondition === opt.value}
+                                            onChange={() => setSelectedCondition(opt.value)}
+                                            style={{ display: 'none' }}
+                                        />
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ fontWeight: '700', color: '#111827', marginBottom: '0.25rem' }}>{opt.label}</div>
+                                            <div style={{ fontSize: '0.8rem', color: '#6b7280', lineHeight: 1.4 }}>{opt.desc}</div>
                                         </div>
-                                    )}
-                                </label>
-
-                                <label style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '1rem',
-                                    padding: '1.25rem',
-                                    border: selectedCondition === BookCondition.DAMAGED ? '2px solid #f59e0b' : '1px solid #e5e7eb',
-                                    borderRadius: '1rem',
-                                    cursor: 'pointer',
-                                    background: selectedCondition === BookCondition.DAMAGED ? '#fffbeb' : 'white',
-                                    transition: 'all 0.2s',
-                                    position: 'relative'
-                                }}>
-                                    <div style={{
-                                        width: '24px',
-                                        height: '24px',
-                                        borderRadius: '50%',
-                                        border: selectedCondition === BookCondition.DAMAGED ? '6px solid #f59e0b' : '2px solid #d1d5db',
-                                        background: 'white',
-                                        flexShrink: 0,
-                                        transition: 'all 0.2s'
-                                    }}></div>
-                                    <input
-                                        type="radio"
-                                        name="condition"
-                                        value={BookCondition.DAMAGED}
-                                        checked={selectedCondition === BookCondition.DAMAGED}
-                                        onChange={() => setSelectedCondition(BookCondition.DAMAGED)}
-                                        style={{ display: 'none' }}
-                                    />
-                                    <div>
-                                        <div style={{ fontWeight: '700', color: '#111827', marginBottom: '0.25rem' }}>Kondisi Rusak</div>
-                                        <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Halaman sobek, basah, atau hilang</div>
-                                    </div>
-                                    {selectedCondition === BookCondition.DAMAGED && (
-                                        <div style={{ position: 'absolute', right: '1.25rem', top: '50%', transform: 'translateY(-50%)' }}>
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="3" width="20" height="20">
-                                                <polyline points="20 6 9 17 4 12" />
-                                            </svg>
-                                        </div>
-                                    )}
-                                </label>
+                                        {selectedCondition === opt.value && (
+                                            <div style={{ position: 'absolute', right: '1.25rem', top: '50%', transform: 'translateY(-50%)' }}>
+                                                <svg viewBox="0 0 24 24" fill="none" stroke={opt.color} strokeWidth="3" width="20" height="20">
+                                                    <polyline points="20 6 9 17 4 12" />
+                                                </svg>
+                                            </div>
+                                        )}
+                                    </label>
+                                ))}
                             </div>
                         </div>
 

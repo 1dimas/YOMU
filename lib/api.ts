@@ -241,10 +241,10 @@ export const loansApi = {
         });
     },
 
-    verifyReturn: async (id: string, adminNotes?: string) => {
+    verifyReturn: async (id: string, adminNotes?: string, bookCondition?: string, fineAmount?: number) => {
         return fetchApi<ApiResponse<import('@/types').Loan>>(`/loans/${id}/verify-return`, {
             method: 'PUT',
-            body: JSON.stringify({ adminNotes }),
+            body: JSON.stringify({ adminNotes, bookCondition, fineAmount }),
         });
     },
 };
@@ -302,6 +302,19 @@ export const messagesApi = {
     markAllAsRead: async () => {
         return fetchApi<ApiResponse<{ count: number }>>('/messages/read-all', {
             method: 'PUT',
+        });
+    },
+
+    edit: async (messageId: string, content: string) => {
+        return fetchApi<ApiResponse<import('@/types').Message>>(`/messages/${messageId}`, {
+            method: 'PUT',
+            body: JSON.stringify({ content }),
+        });
+    },
+
+    delete: async (messageId: string) => {
+        return fetchApi<ApiResponse<{ deleted: boolean }>>(`/messages/${messageId}`, {
+            method: 'DELETE',
         });
     },
 };

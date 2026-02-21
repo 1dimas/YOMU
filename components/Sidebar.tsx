@@ -151,34 +151,57 @@ export default function Sidebar() {
                             style={{ fontStyle: 'italic', fontSize: '0.85rem' }}
                         >
                             Lihat semua...
-                        </Link> 
+                        </Link>
                     )}
                 </div>
             </div>
 
-            {/* Footer */}
-            {/* <div className="sidebar-footer">
-                <div className="sidebar-profile-card">
-                    <div className="sidebar-profile-avatar">
-                        {user?.avatarUrl ? (
-                            <img src={user.avatarUrl} alt={user.name} />
-                        ) : (
-                            <span>{user?.name?.slice(0, 2).toUpperCase() || "US"}</span>
-                        )}
-                    </div>
-                    <div className="sidebar-profile-info">
-                        <span className="sidebar-profile-name">{user?.name || "User"}</span>
-                        <span className="sidebar-profile-role">{user?.role === "SISWA" ? "Siswa" : "Admin"}</span>
-                    </div>
-                    <button onClick={handleLogout} className="sidebar-profile-logout" title="Keluar">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                            <polyline points="16 17 21 12 16 7" />
-                            <line x1="21" y1="12" x2="9" y2="12" />
-                        </svg>
-                    </button>
-                </div>
-            </div> */}
+            {/* Footer — Panduan */}
+            <div style={{
+                marginTop: 'auto',
+                padding: '1rem 1.25rem',
+                borderTop: '1px solid rgba(255,255,255,0.08)',
+            }}>
+                <button
+                    onClick={() => {
+                        // Clear tour key for current user
+                        const keys = Object.keys(localStorage);
+                        keys.forEach(k => {
+                            if (k.startsWith("yomu_tour_done_v1_")) localStorage.removeItem(k);
+                        });
+                        window.location.href = "/siswa";
+                    }}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.6rem',
+                        width: '100%',
+                        padding: '0.6rem 0.75rem',
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '0.6rem',
+                        color: 'rgba(255,255,255,0.6)',
+                        fontSize: '0.8rem',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                        e.currentTarget.style.color = 'rgba(255,255,255,0.9)';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                        e.currentTarget.style.color = 'rgba(255,255,255,0.6)';
+                    }}
+                >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
+                    </svg>
+                    Panduan Aplikasi
+                </button>
+            </div>
 
         </aside>
     );

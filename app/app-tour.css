@@ -1,0 +1,257 @@
+/* ============================================
+   APP TOUR — Interactive Tutorial Overlay
+   ============================================ */
+
+/* Overlay */
+.tour-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99998;
+    pointer-events: none;
+    animation: tourFadeIn 250ms ease-out;
+}
+
+.tour-overlay svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Tooltip Card */
+.tour-tooltip {
+    position: fixed;
+    z-index: 99999;
+    width: 340px;
+    max-width: calc(100vw - 2rem);
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow:
+        0 20px 60px -12px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(0, 0, 0, 0.05);
+    pointer-events: auto;
+    animation: tourSlideIn 300ms cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+}
+
+/* Tooltip Header — accent bar */
+.tour-tooltip-header {
+    padding: 1.25rem 1.25rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.tour-tooltip-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.tour-tooltip-icon svg {
+    width: 20px;
+    height: 20px;
+    color: white;
+    stroke: white;
+    fill: none;
+}
+
+.tour-tooltip-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    line-height: 1.3;
+}
+
+/* Tooltip Body */
+.tour-tooltip-body {
+    padding: 0.75rem 1.25rem 1rem;
+}
+
+.tour-tooltip-desc {
+    font-size: 0.875rem;
+    color: #64748b;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Tooltip Footer */
+.tour-tooltip-footer {
+    padding: 0.75rem 1.25rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+/* Step Dots */
+.tour-dots {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.tour-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    transition: all 200ms ease;
+}
+
+.tour-dot.active {
+    width: 20px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.tour-dot.done {
+    background: #10b981;
+}
+
+/* Buttons */
+.tour-nav-buttons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.tour-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 150ms ease;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.tour-btn-skip {
+    background: none;
+    color: #94a3b8;
+    padding: 0.5rem 0.75rem;
+}
+
+.tour-btn-skip:hover {
+    color: #64748b;
+}
+
+.tour-btn-back {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.tour-btn-back:hover {
+    background: #e2e8f0;
+}
+
+.tour-btn-next {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.tour-btn-next:hover {
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    transform: translateY(-1px);
+}
+
+.tour-btn-finish {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.tour-btn-finish:hover {
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    transform: translateY(-1px);
+}
+
+/* Arrow */
+.tour-arrow {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: white;
+    transform: rotate(45deg);
+    box-shadow: -2px -2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.tour-arrow-top {
+    bottom: -8px;
+    left: 50%;
+    margin-left: -8px;
+}
+
+.tour-arrow-bottom {
+    top: -8px;
+    left: 50%;
+    margin-left: -8px;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.tour-arrow-left {
+    right: -8px;
+    top: 50%;
+    margin-top: -8px;
+}
+
+.tour-arrow-right {
+    left: -8px;
+    top: 50%;
+    margin-top: -8px;
+}
+
+/* Animations */
+@keyframes tourFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes tourSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .tour-tooltip {
+        width: 280px;
+    }
+
+    .tour-tooltip-header {
+        padding: 1rem 1rem 0;
+    }
+
+    .tour-tooltip-body {
+        padding: 0.5rem 1rem 0.75rem;
+    }
+
+    .tour-tooltip-footer {
+        padding: 0.5rem 1rem 1rem;
+    }
+
+    .tour-btn {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.75rem;
+    }
+}

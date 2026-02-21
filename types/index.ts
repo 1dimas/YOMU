@@ -25,6 +25,7 @@ export enum LoanStatus {
 export enum BookCondition {
     GOOD = 'GOOD',
     DAMAGED = 'DAMAGED',
+    LOST = 'LOST',
 }
 
 export enum MessageType {
@@ -113,10 +114,12 @@ export interface Message {
     receiver?: Partial<User>;
     content: string;
     isRead: boolean;
+    isEdited?: boolean;
     messageType: MessageType;
     bookId?: string;
     book?: Partial<Book>;
     createdAt: string;
+    updatedAt?: string;
 }
 
 export interface Conversation {

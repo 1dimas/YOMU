@@ -35,8 +35,48 @@ function DetailBukuContent() {
     const [loanStatus, setLoanStatus] = useState<string | null>(null);
 
     const [isLoanPopupOpen, setIsLoanPopupOpen] = useState(false);
+    const [isRulesOpen, setIsRulesOpen] = useState(false);
     const [loanDuration, setLoanDuration] = useState(7);
     const [termsAccepted, setTermsAccepted] = useState(false);
+    const [libraryRules, setLibraryRules] = useState<string>("");
+
+    useEffect(() => {
+        const DEFAULT_RULES = `## Peraturan Peminjaman Buku Perpustakaan
+
+### 1. Ketentuan Umum
+- Setiap anggota perpustakaan berhak meminjam buku dengan kartu anggota yang masih berlaku.
+- Maksimal peminjaman adalah **3 buku** sekaligus.
+- Durasi peminjaman maksimal adalah **7 hari** kalender.
+
+### 2. Prosedur Peminjaman
+- Pilih buku yang ingin dipinjam melalui katalog.
+- Klik tombol "Pinjam Buku" dan pilih durasi peminjaman.
+- Tunggu persetujuan dari petugas perpustakaan.
+- Setelah disetujui, ambil buku di meja layanan perpustakaan.
+
+### 3. Pengembalian Buku
+- Buku wajib dikembalikan sebelum atau pada tanggal jatuh tempo.
+- Pengembalian dilakukan di meja layanan perpustakaan.
+- Pastikan kondisi buku baik saat dikembalikan.
+
+### 4. Keterlambatan & Denda
+- Keterlambatan pengembalian dikenakan denda **Rp 1.000 per hari** per buku.
+- Buku yang rusak atau hilang wajib diganti sesuai harga buku.
+
+### 5. Larangan
+- Dilarang memindahtangankan buku pinjaman kepada orang lain.
+- Dilarang mencoret, melipat, atau merusak buku.
+- Dilarang membawa makanan/minuman saat membaca di perpustakaan.
+
+---
+
+*Dengan meminjam buku, Anda menyetujui semua peraturan di atas.*`;
+
+        if (typeof window !== "undefined") {
+            const savedRules = localStorage.getItem("library_rules");
+            setLibraryRules(savedRules || DEFAULT_RULES);
+        }
+    }, []);
 
     const fetchBook = useCallback(async () => {
         if (!bookId) return;
@@ -170,20 +210,6 @@ function DetailBukuContent() {
 
     return (
         <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '2rem 1.5rem 4rem', fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
-            {/* Back Button */}
-            <Link href="/siswa/katalog" style={{
-                display: 'inline-flex', alignItems: 'center', gap: '8px',
-                color: '#6b7280', textDecoration: 'none', fontSize: '14px', fontWeight: 500,
-                padding: '8px 16px', background: 'white', borderRadius: '10px',
-                border: '1px solid #e5e7eb', marginBottom: '2rem',
-                transition: 'all 0.2s',
-            }}>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: '16px', height: '16px' }}>
-                    <polyline points="15 18 9 12 15 6" />
-                </svg>
-                Kembali ke Katalog
-            </Link>
-
             {/* ===== HERO SECTION ===== */}
             <div style={{
                 display: 'flex', gap: '3rem', background: 'white', borderRadius: '20px',
@@ -461,9 +487,13 @@ function DetailBukuContent() {
                                         style={{ marginTop: '3px', width: '18px', height: '18px', accentColor: '#3b82f6', flexShrink: 0 }} />
                                     <span style={{ fontSize: '13px', lineHeight: 1.6, color: '#4b5563' }}>
                                         Saya menyetujui{" "}
-                                        <a href="/siswa/peraturan" target="_blank" style={{ color: '#3b82f6', textDecoration: 'underline' }}>
+                                        <button
+                                            type="button"
+                                            onClick={(e) => { e.preventDefault(); setIsRulesOpen(true); }}
+                                            style={{ color: '#3b82f6', textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', font: 'inherit', fontSize: 'inherit', padding: 0 }}
+                                        >
                                             syarat & ketentuan peminjaman
-                                        </a>
+                                        </button>
                                         {" "}dan bertanggung jawab atas buku yang dipinjam.
                                     </span>
                                 </label>
@@ -511,6 +541,87 @@ function DetailBukuContent() {
                 </div>
             )}
             <style>{`@keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }`}</style>
+
+            {/* ===== RULES POPUP ===== */}
+            {isRulesOpen && (
+                <div style={{
+                    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    zIndex: 1100, backdropFilter: 'blur(4px)',
+                }} onClick={() => setIsRulesOpen(false)}>
+                    <div style={{
+                        background: 'white', borderRadius: '20px', maxWidth: '560px', width: '90%',
+                        maxHeight: '80vh', display: 'flex', flexDirection: 'column',
+                        boxShadow: '0 20px 60px rgba(0,0,0,0.15)', overflow: 'hidden',
+                        animation: 'fadeIn 0.2s ease-out',
+                    }} onClick={(e) => e.stopPropagation()}>
+                        {/* Header */}
+                        <div style={{
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            padding: '20px 24px', borderBottom: '1px solid #f1f5f9', flexShrink: 0,
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <div style={{
+                                    width: '36px', height: '36px', borderRadius: '10px',
+                                    background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                }}>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" style={{ width: '18px', height: '18px' }}>
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                        <polyline points="14 2 14 8 20 8" />
+                                        <line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" />
+                                    </svg>
+                                </div>
+                                <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#111827' }}>Peraturan Peminjaman</h2>
+                            </div>
+                            <button onClick={() => setIsRulesOpen(false)} style={{
+                                width: '32px', height: '32px', borderRadius: '8px', border: 'none',
+                                background: '#f3f4f6', cursor: 'pointer', display: 'flex',
+                                alignItems: 'center', justifyContent: 'center', color: '#6b7280',
+                            }}>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+                                    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        {/* Scrollable Content */}
+                        <div style={{ padding: '24px', overflowY: 'auto', flex: 1 }}>
+                            <div
+                                style={{
+                                    lineHeight: 1.8,
+                                    fontSize: "0.9rem",
+                                    color: "#334155"
+                                }}
+                                dangerouslySetInnerHTML={{
+                                    __html: libraryRules
+                                        .replace(/## (.*)/g, '<h2 style="font-size:1.25rem;font-weight:700;margin:1.5rem 0 0.75rem;color:#1e293b">$1</h2>')
+                                        .replace(/### (.*)/g, '<h3 style="font-size:1rem;font-weight:600;margin:1.25rem 0 0.5rem;color:#334155">$1</h3>')
+                                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                        .replace(/- (.*)/g, '<li style="margin-left:1.5rem;margin-bottom:0.25rem">$1</li>')
+                                        .replace(/\n\n/g, '<br/>')
+                                        .replace(/---/g, '<hr style="border:none;border-top:1px solid #e2e8f0;margin:1.5rem 0"/>')
+                                        .replace(/\*(.*?)\*/g, '<em style="color:#64748b">$1</em>'),
+                                }}
+                            />
+                        </div>
+
+                        {/* Footer */}
+                        <div style={{
+                            padding: '16px 24px', borderTop: '1px solid #f1f5f9',
+                            display: 'flex', justifyContent: 'flex-end', flexShrink: 0,
+                        }}>
+                            <button onClick={() => setIsRulesOpen(false)} style={{
+                                padding: '10px 24px', background: '#3b82f6', color: 'white',
+                                border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: 600,
+                                cursor: 'pointer', boxShadow: '0 2px 8px rgba(59,130,246,0.3)',
+                            }}>
+                                Saya Mengerti
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

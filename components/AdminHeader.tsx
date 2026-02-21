@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/lib/auth-context";
 import { useState, useEffect, useRef } from "react";
-import { messagesApi, loansApi } from "@/lib/api";
+import { messagesApi } from "@/lib/api";
 import { useRouter } from "next/navigation";
 
 interface AdminHeaderProps {
@@ -36,75 +36,43 @@ export default function AdminHeader({ title, subtitle }: AdminHeaderProps) {
     const router = useRouter();
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
     const [notifications, setNotifications] = useState<NotifItem[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [unreadCount, setUnreadCount] = useState(0);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    const unreadCount = notifications.filter(n => !n.read).length;
-
-    // Fetch real notifications: pending loans + unread messages
+    // Fetch unread messages only — same as siswa header
     const fetchNotifications = async () => {
-        if (!user?.id) return; // Don't fetch if not authenticated yet
+        if (!user?.id) return;
         try {
-            const [loansRes, conversationsRes] = await Promise.all([
-                loansApi.getAll({ status: "PENDING" } as never),
-                messagesApi.getConversations(),
-            ]);
-
-            const notifs: NotifItem[] = [];
-
-            // Pending loan requests → notifikasi untuk admin
-            const pendingLoans = (loansRes.data || []).slice(0, 5);
-            for (const loan of pendingLoans) {
-                notifs.push({
-                    id: `loan-${loan.id}`,
-                    title: "Permintaan Peminjaman",
-                    message: `${loan.user?.name || "Siswa"} meminta pinjam "${loan.book?.title || "buku"}"`,
-                    time: timeAgo(loan.createdAt || loan.loanDate),
-                    read: false,
-                    type: "loan",
-                    href: "/admin/peminjaman",
-                });
-            }
-
-            // Unread messages from conversations
-            const conversations = (conversationsRes.data || []) as Array<{
+            const convRes = await messagesApi.getConversations();
+            const conversations = (convRes.data || []) as Array<{
                 id: string;
                 lastMessageAt: string;
-                participant1?: { name: string };
-                participant2?: { name: string };
-                lastMessage?: { content: string; isRead: boolean; senderId: string };
+                unreadCount?: number;
+                otherUser?: { id: string; name: string };
+                lastMessage?: { content: string; createdAt: string };
             }>;
 
-            for (const conv of conversations.slice(0, 5)) {
-                const lastMsg = conv.lastMessage;
-                if (!lastMsg) continue;
-                // Only show if the last message was sent by the other person (not admin) and unread
-                if (lastMsg.senderId === user?.id) continue;
-                const otherUser = conv.participant1?.name !== user?.name
-                    ? conv.participant1?.name
-                    : conv.participant2?.name;
-                notifs.push({
-                    id: `msg-${conv.id}`,
-                    title: "Pesan Baru",
-                    message: `${otherUser || "Siswa"}: ${lastMsg.content.slice(0, 50)}${lastMsg.content.length > 50 ? "..." : ""}`,
-                    time: timeAgo(conv.lastMessageAt),
-                    read: lastMsg.isRead,
-                    type: "message",
-                    href: "/admin/pesan",
-                });
-            }
+            // Total badge count
+            const total = conversations.reduce((acc, c) => acc + (c.unreadCount || 0), 0);
+            setUnreadCount(total);
 
-            // Sort: unread first, then by time
-            notifs.sort((a, b) => {
-                if (a.read !== b.read) return a.read ? 1 : -1;
-                return 0;
-            });
+            // Only conversations with unread messages
+            const notifs: NotifItem[] = conversations
+                .filter(c => c.lastMessage && c.unreadCount && c.unreadCount > 0)
+                .slice(0, 5)
+                .map(c => ({
+                    id: `msg-${c.id}`,
+                    title: `Pesan dari ${c.otherUser?.name || "Pengguna"}`,
+                    message: c.lastMessage?.content || "",
+                    time: timeAgo(c.lastMessage?.createdAt || c.lastMessageAt),
+                    read: false,
+                    type: "message" as const,
+                    href: "/admin/pesan",
+                }));
 
             setNotifications(notifs);
         } catch (err) {
             console.error("Failed to fetch admin notifications:", err);
-        } finally {
-            setIsLoading(false);
         }
     };
 
@@ -128,8 +96,14 @@ export default function AdminHeader({ title, subtitle }: AdminHeaderProps) {
     }, []);
 
     const handleMarkAllRead = async () => {
-        await messagesApi.markAllAsRead();
-        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+        try {
+            await messagesApi.markAllAsRead();
+        } catch {
+            // Best-effort — clear UI regardless
+        }
+        // Clear all notifications so badge disappears immediately
+        setNotifications([]);
+        setIsNotificationOpen(false);
     };
 
     const handleNotifClick = (notif: NotifItem) => {
@@ -291,11 +265,7 @@ export default function AdminHeader({ title, subtitle }: AdminHeaderProps) {
 
                             {/* List */}
                             <div style={{ maxHeight: '320px', overflowY: 'auto' }}>
-                                {isLoading ? (
-                                    <div style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem' }}>
-                                        Memuat...
-                                    </div>
-                                ) : notifications.length === 0 ? (
+                                {notifications.length === 0 ? (
                                     <div style={{ padding: '2rem', textAlign: 'center' }}>
                                         <svg viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1.5" width="40" height="40" style={{ margin: '0 auto 0.75rem', display: 'block' }}>
                                             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />

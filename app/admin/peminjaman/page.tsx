@@ -25,6 +25,8 @@ export default function ManajemenPeminjamanPage() {
     const [editingLoan, setEditingLoan] = useState<Loan | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [adminNotes, setAdminNotes] = useState("");
+    const [returnCondition, setReturnCondition] = useState<string>("GOOD");
+    const [fineAmount, setFineAmount] = useState<string>("");
 
     useEffect(() => {
         if (!authLoading && (!isAuthenticated || user?.role !== 'ADMIN')) {
@@ -104,6 +106,8 @@ export default function ManajemenPeminjamanPage() {
     const handleOpenModal = (loan: Loan) => {
         setEditingLoan(loan);
         setAdminNotes("");
+        setReturnCondition("GOOD");
+        setFineAmount("");
         setIsModalOpen(true);
     };
 
@@ -111,6 +115,8 @@ export default function ManajemenPeminjamanPage() {
         setIsModalOpen(false);
         setEditingLoan(null);
         setAdminNotes("");
+        setReturnCondition("GOOD");
+        setFineAmount("");
     };
 
     const handleApprove = async () => {
@@ -149,7 +155,8 @@ export default function ManajemenPeminjamanPage() {
         if (!editingLoan) return;
         setIsSubmitting(true);
         try {
-            await loansApi.verifyReturn(editingLoan.id, adminNotes);
+            const fine = fineAmount ? parseInt(fineAmount, 10) : undefined;
+            await loansApi.verifyReturn(editingLoan.id, adminNotes, returnCondition, fine);
             const response = await loansApi.getAll({});
             setLoans(response.data || []);
             handleCloseModal();
@@ -355,17 +362,86 @@ export default function ManajemenPeminjamanPage() {
                                     <span className="info-label">TENGGAT KEMBALI</span>
                                     <span className="info-value">{formatDate(editingLoan.dueDate)}</span>
                                 </div>
-                                {editingLoan.returnCondition && (
-                                    <div className="info-row">
-                                        <span className="info-label">KONDISI BUKU</span>
-                                        <span className="info-value" style={{
-                                            color: editingLoan.returnCondition === 'GOOD' ? '#10b981' : '#f59e0b'
-                                        }}>
-                                            {editingLoan.returnCondition === 'GOOD' ? 'Baik' : 'Rusak'}
-                                        </span>
-                                    </div>
-                                )}
+                                {editingLoan.bookCondition && (() => {
+                                    const condMap: Record<string, { label: string; color: string }> = {
+                                        GOOD: { label: 'Baik', color: '#10b981' },
+                                        DAMAGED: { label: 'Rusak', color: '#f59e0b' },
+                                        LOST: { label: 'Hilang', color: '#ef4444' },
+                                    };
+                                    const cond = condMap[editingLoan.bookCondition] || { label: editingLoan.bookCondition, color: '#6b7280' };
+                                    return (
+                                        <div className="info-row">
+                                            <span className="info-label">LAPORAN SISWA</span>
+                                            <span className="info-value" style={{ color: cond.color, fontWeight: '600' }}>
+                                                {cond.label}
+                                            </span>
+                                        </div>
+                                    );
+                                })()}
                             </div>
+
+                            {/* Condition selector - only for RETURNING */}
+                            {editingLoan.status === "RETURNING" && (
+                                <div className="form-group">
+                                    <label style={{ fontWeight: '600', marginBottom: '8px', display: 'block' }}>Kondisi Buku</label>
+                                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                                        {[
+                                            { value: 'GOOD', label: '✅ Baik', color: '#10b981', bg: '#ecfdf5' },
+                                            { value: 'DAMAGED', label: '⚠️ Rusak', color: '#f59e0b', bg: '#fffbeb' },
+                                            { value: 'LOST', label: '❌ Hilang', color: '#ef4444', bg: '#fef2f2' },
+                                        ].map(opt => (
+                                            <button
+                                                key={opt.value}
+                                                type="button"
+                                                onClick={() => setReturnCondition(opt.value)}
+                                                style={{
+                                                    padding: '10px 20px',
+                                                    borderRadius: '8px',
+                                                    border: returnCondition === opt.value ? `2px solid ${opt.color}` : '2px solid #e5e7eb',
+                                                    background: returnCondition === opt.value ? opt.bg : 'white',
+                                                    color: returnCondition === opt.value ? opt.color : '#6b7280',
+                                                    fontWeight: returnCondition === opt.value ? '600' : '400',
+                                                    cursor: 'pointer',
+                                                    fontSize: '14px',
+                                                    transition: 'all 0.15s',
+                                                    flex: '1',
+                                                    minWidth: '100px',
+                                                    textAlign: 'center',
+                                                }}
+                                            >
+                                                {opt.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Fine input - only when DAMAGED or LOST */}
+                            {editingLoan.status === "RETURNING" && returnCondition !== 'GOOD' && (
+                                <div className="form-group">
+                                    <label style={{ fontWeight: '600', marginBottom: '8px', display: 'block' }}>Nominal Denda (Rp)</label>
+                                    <input
+                                        type="number"
+                                        placeholder="Contoh: 20000"
+                                        value={fineAmount}
+                                        onChange={(e) => setFineAmount(e.target.value)}
+                                        min="0"
+                                        style={{
+                                            width: '100%',
+                                            padding: '10px 14px',
+                                            borderRadius: '8px',
+                                            border: '1px solid #d1d5db',
+                                            fontSize: '14px',
+                                            outline: 'none',
+                                        }}
+                                    />
+                                    {fineAmount && parseInt(fineAmount) > 0 && (
+                                        <div style={{ marginTop: '6px', fontSize: '13px', color: '#6b7280' }}>
+                                            💰 Denda: <strong style={{ color: '#ef4444' }}>Rp {parseInt(fineAmount).toLocaleString('id-ID')}</strong>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
 
                             <div className="form-group">
                                 <label>Catatan Admin (opsional)</label>
