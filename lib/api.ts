@@ -109,6 +109,20 @@ export const authApi = {
         return response.data;
     },
 
+    forgotPassword: async (email: string) => {
+        return fetchApi<ApiResponse<null>>('/auth/forgot-password', {
+            method: 'POST',
+            body: JSON.stringify({ email }),
+        });
+    },
+
+    resetPassword: async (token: string, newPassword: string) => {
+        return fetchApi<ApiResponse<null>>('/auth/reset-password', {
+            method: 'POST',
+            body: JSON.stringify({ token, newPassword }),
+        });
+    },
+
     logout: async () => {
         try {
             await fetchApi('/auth/logout', { method: 'POST' });
@@ -121,9 +135,16 @@ export const authApi = {
         return fetchApi<ApiResponse<import('@/types').User>>('/auth/me');
     },
 
-    updateProfile: async (data: { name?: string; avatarUrl?: string }) => {
+    updateProfile: async (data: { name?: string; email?: string; avatarUrl?: string }) => {
         return fetchApi<ApiResponse<import('@/types').User>>('/auth/profile', {
             method: 'PUT',
+            body: JSON.stringify(data),
+        });
+    },
+
+    changePassword: async (data: { currentPassword: string; newPassword: string }) => {
+        return fetchApi<ApiResponse<null>>('/auth/change-password', {
+            method: 'POST',
             body: JSON.stringify(data),
         });
     },
@@ -213,7 +234,7 @@ export const loansApi = {
         return fetchApi<ApiResponse<import('@/types').Loan[]>>('/loans/overdue');
     },
 
-    create: async (bookId: string, durationDays = 7) => {
+    create: async (bookId: string, durationDays = 3) => {
         return fetchApi<ApiResponse<import('@/types').Loan>>('/loans', {
             method: 'POST',
             body: JSON.stringify({ bookId, durationDays }),
@@ -234,17 +255,17 @@ export const loansApi = {
         });
     },
 
-    requestReturn: async (id: string, bookCondition: import('@/types').BookCondition) => {
+    requestReturn: async (id: string, reportedDamaged?: boolean, studentNote?: string) => {
         return fetchApi<ApiResponse<import('@/types').Loan>>(`/loans/${id}/return`, {
             method: 'PUT',
-            body: JSON.stringify({ bookCondition }),
+            body: JSON.stringify({ reportedDamaged, studentNote }),
         });
     },
 
-    verifyReturn: async (id: string, adminNotes?: string, bookCondition?: string, fineAmount?: number) => {
+    verifyReturn: async (id: string, adminNotes?: string, isDamaged?: boolean, fineAmount?: number) => {
         return fetchApi<ApiResponse<import('@/types').Loan>>(`/loans/${id}/verify-return`, {
             method: 'PUT',
-            body: JSON.stringify({ adminNotes, bookCondition, fineAmount }),
+            body: JSON.stringify({ adminNotes, isDamaged, fineAmount }),
         });
     },
 };
@@ -385,7 +406,7 @@ export const reportsApi = {
 
     exportLoansPDF: async (params?: { status?: string; startDate?: string; endDate?: string }): Promise<Blob> => {
         const token = getToken();
-        let url = `${API_URL}/reports/loans/export`;
+        let url = `${API_URL}/reports/export`;
         if (params) {
             const searchParams = new URLSearchParams();
             Object.entries(params).forEach(([key, value]) => {
@@ -401,7 +422,7 @@ export const reportsApi = {
         const response = await fetch(url, {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
-        if (!response.ok) throw new Error('Failed to export PDF');
+        if (!response.ok) throw new Error('Failed to export');
         return response.blob();
     },
 };

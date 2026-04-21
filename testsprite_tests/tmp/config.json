@@ -1,0 +1,20 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:3001",
+  "loginUser": "admin@yomu.id",
+  "loginPassword": "admin123",
+  "executionArgs": {
+    "projectName": "fe-yomu",
+    "projectPath": "/home/dimas/Documents/LAST BOSS/fe-yomu",
+    "testIds": [],
+    "additionalInstruction": "",
+    "serverMode": "development",
+    "envs": {
+      "API_KEY": "sk-user-QaCvTxgHz81CqMZlZd4rR6CFQZ9kuJuM0ChWx-9pOnJ7cb30sXCvCPLURUJqnUfjPMBReRDNLl-wY2aSYV__mvqms1RL9o4KNDQfMvoS32p7Gu85xv0Qehh0k9SjWpzrwiA"
+    }
+  },
+  "serverPort": 38665,
+  "proxy": "http://b67e64bf-6328-4e8f-bfd1-ea853bd10fc1:Mv4QKS2jQLq8zZ2ssyNaHqbr4Cqu3o67@tun.testsprite.com:8080"
+}

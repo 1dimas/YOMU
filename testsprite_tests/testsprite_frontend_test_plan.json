@@ -1,0 +1,3778 @@
+[
+  {
+    "id": "TC001",
+    "title": "Student can log in and reach student dashboard",
+    "description": "Verifies a SISWA user can log in with valid credentials and is redirected to the student dashboard.",
+    "category": "User Login",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Login\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email input field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password input field"
+      },
+      {
+        "type": "action",
+        "description": "Click the login button to submit"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Dashboard\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "Admin can log in and reach admin dashboard",
+    "description": "Verifies an ADMIN user can log in with valid credentials and is redirected to the admin dashboard.",
+    "category": "User Login",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Login\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email input field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password input field"
+      },
+      {
+        "type": "action",
+        "description": "Click the login button to submit"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Successful student registration redirects to login",
+    "description": "Verifies a new student can register with valid profile details and is redirected to the login page with a visible success confirmation.",
+    "category": "User Registration",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /register"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify page title contains \"Register\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"Test Student\" into the full name field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"test.student.unique.20260308@yomu-example.test\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Select \"Class 10\" from the class dropdown"
+      },
+      {
+        "type": "action",
+        "description": "Select \"Science\" from the major dropdown"
+      },
+      {
+        "type": "action",
+        "description": "Type \"P@ssw0rd123!\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"P@ssw0rd123!\" into the confirm password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the register button to submit"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/login\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Registration successful\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Registration fails when confirm password does not match",
+    "description": "Verifies the form shows a validation error when password and confirm password do not match.",
+    "category": "User Registration",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /register"
+      },
+      {
+        "type": "action",
+        "description": "Type \"Mismatch Password\" into the full name field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"mismatch.pw.20260308@yomu-example.test\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Select \"Class 10\" from the class dropdown"
+      },
+      {
+        "type": "action",
+        "description": "Select \"Science\" from the major dropdown"
+      },
+      {
+        "type": "action",
+        "description": "Type \"P@ssw0rd123!\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Toggle password visibility"
+      },
+      {
+        "type": "action",
+        "description": "Type \"DifferentP@ssw0rd123!\" into the confirm password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the register button to submit"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"passwords do not match\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Required field validation when submitting empty form",
+    "description": "Verifies the registration form shows required-field validation messages when submitted with no inputs.",
+    "category": "User Registration",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /register"
+      },
+      {
+        "type": "action",
+        "description": "Click the register button to submit"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Full name is required\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Email is required\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Class is required\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Major is required\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Password is required\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Invalid email format is rejected",
+    "description": "Verifies the email field validation rejects an improperly formatted email address.",
+    "category": "User Registration",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /register"
+      },
+      {
+        "type": "action",
+        "description": "Type \"Invalid Email\" into the full name field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"invalid-email-format\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Select \"Class 10\" from the class dropdown"
+      },
+      {
+        "type": "action",
+        "description": "Select \"Science\" from the major dropdown"
+      },
+      {
+        "type": "action",
+        "description": "Type \"P@ssw0rd123!\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"P@ssw0rd123!\" into the confirm password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the register button to submit"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Invalid email\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Password visibility toggle does not clear password input",
+    "description": "Verifies toggling password visibility keeps the entered password intact and allows successful submission when other fields are valid.",
+    "category": "User Registration",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /register"
+      },
+      {
+        "type": "action",
+        "description": "Type \"Toggle Test\" into the full name field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"toggle.test.20260308@yomu-example.test\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Select \"Class 10\" from the class dropdown"
+      },
+      {
+        "type": "action",
+        "description": "Select \"Science\" from the major dropdown"
+      },
+      {
+        "type": "action",
+        "description": "Type \"P@ssw0rd123!\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Toggle password visibility"
+      },
+      {
+        "type": "action",
+        "description": "Toggle password visibility"
+      },
+      {
+        "type": "action",
+        "description": "Type \"P@ssw0rd123!\" into the confirm password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the register button to submit"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/login\""
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Dropdowns load and allow selection for class and major",
+    "description": "Verifies the class and major dropdowns are present, can be opened, and a selection is reflected for both.",
+    "category": "User Registration",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /register"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Class dropdown\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the class dropdown"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Class 10\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Select \"Class 10\" from the class dropdown"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Major dropdown\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the major dropdown"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Science\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Select \"Science\" from the major dropdown"
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Forgot Password - request reset with registered email shows success confirmation",
+    "description": "Verifies that submitting a registered email on Forgot Password shows a visible success message indicating a reset email was sent.",
+    "category": "Forgot Password",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /forgot-password"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Forgot Password\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Click the submit button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text indicating a reset email was sent is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the email field is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Forgot Password - unknown email shows email-not-found error",
+    "description": "Verifies that submitting an unregistered email displays a visible error message (email not found).",
+    "category": "Forgot Password",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /forgot-password"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Forgot Password\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Type \"unknown-user-404@example.com\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Click the submit button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text indicating the email was not found is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Forgot Password - submitting with empty email shows validation message",
+    "description": "Verifies that the form blocks submission and shows a visible validation message when email is empty.",
+    "category": "Forgot Password",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /forgot-password"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Forgot Password\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the submit button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text indicating the email is required is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the email field is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Forgot Password - invalid email format shows validation error",
+    "description": "Verifies that entering a malformed email shows a visible invalid email validation message.",
+    "category": "Forgot Password",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /forgot-password"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Forgot Password\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Type \"not-an-email\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Click the submit button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text indicating a valid email is required is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Forgot Password - trimming behavior for email with leading/trailing spaces",
+    "description": "Verifies that an email with leading/trailing spaces can still be submitted and results in a success confirmation for a registered email.",
+    "category": "Forgot Password",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /forgot-password"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Forgot Password\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Type \"  {{LOGIN_USER}}  \" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Click the submit button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text indicating a reset email was sent is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC014",
+    "title": "Forgot Password - resubmitting after an error works after correcting email",
+    "description": "Verifies that after an email-not-found error, changing to a registered email and submitting shows a success message.",
+    "category": "Forgot Password",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /forgot-password"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Forgot Password\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Type \"unknown-user-404@example.com\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Click the submit button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text indicating the email was not found is visible"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Click the submit button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text indicating a reset email was sent is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC015",
+    "title": "Forgot Password - page loads with expected primary controls visible",
+    "description": "Verifies the Forgot Password page renders the email field and submit button so the user can request a reset.",
+    "category": "Forgot Password",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /forgot-password"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Forgot Password\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Email\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Submit\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC016",
+    "title": "Validation: mismatched confirm password blocks submission",
+    "description": "Verifies the form shows a visible validation error when password and confirm password do not match.",
+    "category": "Reset Password",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /reset-password"
+      },
+      {
+        "type": "action",
+        "description": "Type \"NewPassword#123\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"DifferentPassword#123\" into the confirm password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Submit\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Passwords do not match\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/reset-password\""
+      }
+    ]
+  },
+  {
+    "id": "TC017",
+    "title": "Validation: required fields show errors when submitting empty form",
+    "description": "Verifies required-field validation appears when submitting without entering a password.",
+    "category": "Reset Password",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /reset-password"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Submit\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Password is required\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/reset-password\""
+      }
+    ]
+  },
+  {
+    "id": "TC018",
+    "title": "Password policy: too-short password shows visible error",
+    "description": "Verifies the UI enforces password policy by rejecting an obviously too-short password.",
+    "category": "Reset Password",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /reset-password"
+      },
+      {
+        "type": "action",
+        "description": "Type \"123\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"123\" into the confirm password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Submit\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Password must be\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/reset-password\""
+      }
+    ]
+  },
+  {
+    "id": "TC019",
+    "title": "Student dashboard loads and shows statistics and recommendations",
+    "description": "Verifies an authenticated student can open the dashboard and see stats and recommended books.",
+    "category": "Student Dashboard",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Dashboard\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Dashboard statistics section\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Recommended books list\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC020",
+    "title": "Open a recommended book from dashboard to reach the book detail page",
+    "description": "Verifies a student can click a recommended book card from the dashboard and land on the book detail page.",
+    "category": "Student Dashboard",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the \"Recommended books\" section"
+      },
+      {
+        "type": "action",
+        "description": "Click the first recommended book card"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa/detail\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Book detail\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC021",
+    "title": "Quick navigation from dashboard to Catalog page",
+    "description": "Verifies a student can use dashboard navigation to reach the catalog page.",
+    "category": "Student Dashboard",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Katalog\" in the sidebar menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa/katalog\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Katalog\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC022",
+    "title": "Quick navigation from dashboard to Loans page",
+    "description": "Verifies a student can use dashboard navigation to reach the loans management page.",
+    "category": "Student Dashboard",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Peminjaman\" in the sidebar menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa/peminjaman\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Peminjaman\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC023",
+    "title": "Dashboard layout essentials are visible (header and sidebar)",
+    "description": "Verifies the student dashboard renders core layout elements used for navigation and identity.",
+    "category": "Student Dashboard",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Header\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Sidebar\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Dashboard main content\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC024",
+    "title": "Dashboard handles empty recommendations state gracefully",
+    "description": "Verifies the dashboard shows a clear, user-friendly message when no recommendations are available.",
+    "category": "Student Dashboard",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the \"Recommended books\" section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Recommended books list\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Tidak ada rekomendasi\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC025",
+    "title": "Dashboard statistics section shows readable values",
+    "description": "Verifies the dashboard stats area presents human-readable numbers/labels rather than placeholders or blank content.",
+    "category": "Student Dashboard",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Dashboard statistics section\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Total\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Peminjaman\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC026",
+    "title": "Search books by title and open a book detail from catalog",
+    "description": "Verifies a student can search by title in the catalog and open a book detail page from the results.",
+    "category": "Book Catalog",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Katalog\" in the student navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa/katalog\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"Harry\" into the search field"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Book results list\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first visible book card"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa/detail\""
+      }
+    ]
+  },
+  {
+    "id": "TC027",
+    "title": "Filter catalog by category and verify results update",
+    "description": "Verifies a student can filter the catalog by category and see the catalog update accordingly.",
+    "category": "Book Catalog",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Katalog\" in the student navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa/katalog\""
+      },
+      {
+        "type": "action",
+        "description": "Select \"Fiksi\" from the category dropdown"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Book results list\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Fiksi\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC028",
+    "title": "Use pagination to browse additional pages in the catalog",
+    "description": "Verifies a student can move to the next page of the catalog using pagination controls.",
+    "category": "Book Catalog",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Katalog\" in the student navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa/katalog\""
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the pagination controls"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Next\" pagination button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Book results list\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC029",
+    "title": "Search with no matching results shows 'no books found' state",
+    "description": "Verifies the catalog shows a clear empty state when a search query returns no matches.",
+    "category": "Book Catalog",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Katalog\" in the student navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa/katalog\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"zzzz-no-such-book-12345\" into the search field"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"no books found\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC030",
+    "title": "Combine category filter then search within that category",
+    "description": "Verifies the catalog supports using category filtering and title search together without breaking results rendering.",
+    "category": "Book Catalog",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Katalog\" in the student navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa/katalog\""
+      },
+      {
+        "type": "action",
+        "description": "Select \"Fiksi\" from the category dropdown"
+      },
+      {
+        "type": "action",
+        "description": "Type \"Petualangan\" into the search field"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Book results list\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC031",
+    "title": "Changing category after a no-results search updates the empty state",
+    "description": "Verifies that switching category while in a no-results state updates the UI and does not remain stuck.",
+    "category": "Book Catalog",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Katalog\" in the student navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa/katalog\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"zzzz-no-such-book-12345\" into the search field"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"no books found\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Select \"Semua\" from the category dropdown"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Book results list\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC032",
+    "title": "Open book detail from a filtered or paginated view",
+    "description": "Verifies a student can open a book detail page even after changing the catalog view via filter or pagination.",
+    "category": "Book Catalog",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Katalog\" in the student navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa/katalog\""
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the pagination controls"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Next\" pagination button"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first visible book card"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa/detail\""
+      }
+    ]
+  },
+  {
+    "id": "TC033",
+    "title": "Borrow request from book detail shows pending confirmation",
+    "description": "Verifies a student can open a book detail from the catalog and submit a borrow request, then sees a confirmation indicating the request was created.",
+    "category": "Book Detail and Borrowing",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Katalog\" in the student navigation menu"
+      },
+      {
+        "type": "action",
+        "description": "Click on a book card in the catalog list"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Submit a borrow request\" button"
+      }
+    ]
+  },
+  {
+    "id": "TC034",
+    "title": "Book detail page shows key book information",
+    "description": "Verifies that opening a book from the catalog displays the book detail page with visible book information content.",
+    "category": "Book Detail and Borrowing",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Katalog\" in the student navigation menu"
+      },
+      {
+        "type": "action",
+        "description": "Click on a book card in the catalog list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa/detail\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Reviews\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC035",
+    "title": "Read reviews and ratings on book detail",
+    "description": "Verifies that a student can view the reviews section on the book detail page and see rating/review content area.",
+    "category": "Book Detail and Borrowing",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Katalog\" in the student navigation menu"
+      },
+      {
+        "type": "action",
+        "description": "Click on a book card in the catalog list"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the reviews section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"reviews list\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC036",
+    "title": "Add to favorites from book detail and see it in Favorites list",
+    "description": "Verifies that a student can add a book to favorites from the detail page and then see it listed in the Favorites page.",
+    "category": "Book Detail and Borrowing",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Katalog\" in the student navigation menu"
+      },
+      {
+        "type": "action",
+        "description": "Click on a book card in the catalog list"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Add to favorites\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Favorit\" in the student navigation menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"favorites list\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC037",
+    "title": "Unavailable book: submitting borrow request shows error message",
+    "description": "Verifies that attempting to borrow a book with zero available stock shows an unavailable error message instead of creating a loan.",
+    "category": "Book Detail and Borrowing",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Katalog\" in the student navigation menu"
+      },
+      {
+        "type": "action",
+        "description": "Click on a book card that shows \"0\" available or otherwise indicates out of stock"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Submit a borrow request\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"unavailable\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC038",
+    "title": "Write and submit a review from book detail",
+    "description": "Verifies that a student can open the review form on a book detail page, submit a review, and see a visible confirmation or the new review appearing.",
+    "category": "Book Detail and Borrowing",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Katalog\" in the student navigation menu"
+      },
+      {
+        "type": "action",
+        "description": "Click on a book card in the catalog list"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the reviews section"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Write a review\" button"
+      },
+      {
+        "type": "action",
+        "description": "Type \"Great read for class.\" into the review text field"
+      }
+    ]
+  },
+  {
+    "id": "TC039",
+    "title": "Borrow request confirmation can be validated in Loans page",
+    "description": "Verifies that after requesting a borrow, the student can navigate to the Loans page and see an entry indicating the loan exists and is pending.",
+    "category": "Book Detail and Borrowing",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Katalog\" in the student navigation menu"
+      },
+      {
+        "type": "action",
+        "description": "Click on a book card in the catalog list"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Submit a borrow request\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Peminjaman\" in the student navigation menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"PENDING\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC040",
+    "title": "Request return from a loan detail page updates status to RETURNING",
+    "description": "Verifies a student can open a loan, request a return, and see the loan status update to RETURNING.",
+    "category": "Student Loan Management",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa\""
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Peminjaman\" (Loans) menu item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa/peminjaman\""
+      },
+      {
+        "type": "action",
+        "description": "Click on the first loan item in the loans list"
+      }
+    ]
+  },
+  {
+    "id": "TC041",
+    "title": "Request return from loan detail shows status RETURNING on the detail view",
+    "description": "Verifies the loan detail view reflects the updated RETURNING status after submitting a return request.",
+    "category": "Student Loan Management",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa\""
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Peminjaman\" (Loans) menu item"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first loan item in the loans list"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Request Return\" button"
+      }
+    ]
+  },
+  {
+    "id": "TC042",
+    "title": "Filter loans by status shows only matching loans",
+    "description": "Verifies filtering by a specific status updates the list to only show loans matching that status.",
+    "category": "Student Loan Management",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Peminjaman\" (Loans) menu item"
+      },
+      {
+        "type": "action",
+        "description": "Select \"ACTIVE\" from the status filter dropdown"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"ACTIVE\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC043",
+    "title": "Filter loans by RETURNING status shows RETURNING loans",
+    "description": "Verifies filtering to RETURNING updates the list accordingly and shows RETURNING status items.",
+    "category": "Student Loan Management",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Peminjaman\" (Loans) menu item"
+      },
+      {
+        "type": "action",
+        "description": "Select \"RETURNING\" from the status filter dropdown"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"RETURNING\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC044",
+    "title": "View loan details from loans list",
+    "description": "Verifies a student can open a loan from the list and see a loan detail view with identifying information.",
+    "category": "Student Loan Management",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Peminjaman\" (Loans) menu item"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first loan item in the loans list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Loan details\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC045",
+    "title": "Filtering to a status with no results shows an empty state",
+    "description": "Verifies that when a selected status filter has no matching loans, an empty state message is displayed.",
+    "category": "Student Loan Management",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Peminjaman\" (Loans) menu item"
+      },
+      {
+        "type": "action",
+        "description": "Select \"REJECTED\" from the status filter dropdown"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"No loans found\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC046",
+    "title": "Favorites page remains usable after refresh-like re-entry via menu navigation",
+    "description": "Verifies the favorites page can be re-opened via in-app navigation and still shows consistent UI state.",
+    "category": "Student Favorites",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Favorit\" menu item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Favorites list\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Katalog\" menu item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa/katalog\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Favorit\" menu item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa/favorit\""
+      }
+    ]
+  },
+  {
+    "id": "TC047",
+    "title": "Start a new conversation and confirm it is listed",
+    "description": "Verifies a student can start a new conversation, send a first message, and see the conversation appear in the list.",
+    "category": "Student Messaging",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email/username field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa\""
+      },
+      {
+        "type": "action",
+        "description": "Click \"Pesan\" in the student navigation menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Conversations list\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"New conversation\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Message input\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Type \"Hi Admin, I would like to ask about library rules.\" into the message input field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Send\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Hi Admin, I would like to ask about library rules.\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Hi Admin, I would like to ask about library rules.\" is visible in the conversations list"
+      }
+    ]
+  },
+  {
+    "id": "TC048",
+    "title": "Admin can access dashboard and see key metrics",
+    "description": "Verifies an authenticated admin can load the Admin Dashboard and see core statistics widgets.",
+    "category": "Admin Dashboard",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Dashboard\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Dashboard statistics\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC049",
+    "title": "Admin dashboard shows pending loan requests section/list",
+    "description": "Verifies the dashboard displays a visible list/section for pending loan requests.",
+    "category": "Admin Dashboard",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Pending\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Pending loan requests list\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC050",
+    "title": "Admin can open a pending loan request from the dashboard",
+    "description": "Verifies clicking a pending loan item navigates to a detail/inspection view or shows visible details.",
+    "category": "Admin Dashboard",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click the first item in the \"Pending loan requests\" list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Loan\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Loan details\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC051",
+    "title": "Admin dashboard shows overdue items section",
+    "description": "Verifies the dashboard contains an overdue books/items section that is visible to admins.",
+    "category": "Admin Dashboard",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Overdue\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Overdue books\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC052",
+    "title": "Admin dashboard layout includes sidebar navigation to Admin Buku page",
+    "description": "Verifies the admin sidebar is present and can navigate to the book management page via click (not direct URL navigation).",
+    "category": "Admin Dashboard",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Admin sidebar\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Buku\" in the admin sidebar"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin/buku\""
+      }
+    ]
+  },
+  {
+    "id": "TC053",
+    "title": "Admin dashboard layout includes sidebar navigation to Admin Peminjaman page",
+    "description": "Verifies the admin can navigate from the dashboard to loan management using the sidebar menu.",
+    "category": "Admin Dashboard",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click \"Peminjaman\" in the admin sidebar"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin/peminjaman\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Peminjaman\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC054",
+    "title": "Create a new book and verify it appears in the book list",
+    "description": "Verifies an admin can add a new book via the Add Book form and see it listed afterward.",
+    "category": "Admin Book Management",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Buku\" menu item in the admin navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin/buku"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Add\" / \"Tambah Buku\" to add a new book"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Tambah Buku\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"E2E Book Title\" into the Title / Judul field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"E2E Author\" into the Author / Penulis field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"E2E Publisher\" into the Publisher / Penerbit field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"2024\" into the Year / Tahun field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"3\" into the Stock / Stok field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Add\" / \"Simpan\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"E2E Book Title\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC055",
+    "title": "Add book validation: submit with missing required fields shows errors",
+    "description": "Verifies required-field validation messages appear when trying to submit an incomplete Add Book form.",
+    "category": "Admin Book Management",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Buku\" menu item in the admin navigation"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin/buku"
+      },
+      {
+        "type": "action",
+        "description": "Click \"Add\" / \"Tambah Buku\" to add a new book"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Tambah Buku\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Add\" / \"Simpan\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"wajib\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC056",
+    "title": "Create a new category and verify it appears in the list",
+    "description": "Verifies an admin can add a new book category and see it in the categories list.",
+    "category": "Admin Category Management",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Kategori\" menu item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin/kategori"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Add\" or \"Tambah Kategori\" button"
+      },
+      {
+        "type": "action",
+        "description": "Type \"Automation Category A\" into the category name field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"Category created by UI automation\" into the details/description field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Save\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Automation Category A\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC057",
+    "title": "Cancel category creation and verify no new category is added",
+    "description": "Verifies cancelling out of the add-category flow does not add a category to the list.",
+    "category": "Admin Category Management",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Kategori\" menu item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin/kategori"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Add\" or \"Tambah Kategori\" button"
+      },
+      {
+        "type": "action",
+        "description": "Type \"Automation Category Cancel\" into the category name field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Cancel\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Automation Category Cancel\" is not visible"
+      }
+    ]
+  },
+  {
+    "id": "TC058",
+    "title": "Validate required field: attempt to save a category with empty name",
+    "description": "Verifies the category name is required and the UI blocks saving when it is empty.",
+    "category": "Admin Category Management",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Kategori\" menu item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin/kategori"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Add\" or \"Tambah Kategori\" button"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"\" into the category name field"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Save\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"required\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC059",
+    "title": "View members list and search by name/email",
+    "description": "Verifies an admin can open the member management page, see the members list, and filter it using search.",
+    "category": "Admin Member Management",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click \"Anggota\" in the admin navigation menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin/anggota\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Members list\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Type \"a\" into the member search field"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Members list\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC060",
+    "title": "Edit a member and save changes",
+    "description": "Verifies an admin can edit an existing member’s details and see the updated info reflected in the list.",
+    "category": "Admin Member Management",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click \"Anggota\" in the admin navigation menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin/anggota\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"test\" into the member search field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Edit\" button for the first visible member in the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Edit member\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"QA Updated\" into the name field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Save\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"updated\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC061",
+    "title": "Cancel out of editing a member without saving",
+    "description": "Verifies an admin can exit the edit member form without saving changes.",
+    "category": "Admin Member Management",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click \"Anggota\" in the admin navigation menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin/anggota\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Edit\" button for the first visible member in the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Edit member\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Cancel\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Members list\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC062",
+    "title": "Edit member validation: required fields prevent saving",
+    "description": "Verifies the edit member form shows validation and does not save when a required field is empty.",
+    "category": "Admin Member Management",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click \"Anggota\" in the admin navigation menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin/anggota\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Edit\" button for the first visible member in the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Edit member\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Save\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"required\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC063",
+    "title": "Toggle member active status and see status change in list",
+    "description": "Verifies an admin can toggle a member’s active status and the updated status is reflected in the list.",
+    "category": "Admin Member Management",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click \"Anggota\" in the admin navigation menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin/anggota\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Member status\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Toggle active\" control for the first visible member in the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"status\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC064",
+    "title": "Toggle member active status while list is filtered by search",
+    "description": "Verifies an admin can search for a member and toggle active status within the filtered results.",
+    "category": "Admin Member Management",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click \"Anggota\" in the admin navigation menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin/anggota\""
+      },
+      {
+        "type": "action",
+        "description": "Type \"@\" into the member search field"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Members list\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Toggle active\" control for the first visible member in the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"status\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC065",
+    "title": "Delete a member and confirm removal from list",
+    "description": "Verifies an admin can delete a member, confirm the prompt, and see the member removed from the list.",
+    "category": "Admin Member Management",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click \"Anggota\" in the admin navigation menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin/anggota\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Delete\" button for the first visible member in the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Confirm\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Confirm\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"deleted\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC066",
+    "title": "Delete a member and cancel at confirmation",
+    "description": "Verifies an admin can initiate deletion but cancel, leaving the member in the list.",
+    "category": "Admin Member Management",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click \"Anggota\" in the admin navigation menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin/anggota\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Delete\" button for the first visible member in the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Confirm\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Cancel\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Members list\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC067",
+    "title": "Add a new member successfully",
+    "description": "Verifies an admin can add a new member and see it appear in the members list.",
+    "category": "Admin Member Management",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click \"Anggota\" in the admin navigation menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin/anggota\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Add member\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Add member\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"QA New Member\" into the name field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"qa.new.member+e2e@example.com\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"Password123!\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Save\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"created\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC068",
+    "title": "Add member validation: prevent duplicate/invalid email",
+    "description": "Verifies the add member form shows an error when using an invalid or already-used email address.",
+    "category": "Admin Member Management",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click \"Anggota\" in the admin navigation menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin/anggota\""
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Add member\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Add member\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"QA Duplicate\" into the name field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"not-an-email\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"Password123!\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Save\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"invalid\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC069",
+    "title": "Approve a pending loan request from Admin Loan Management",
+    "description": "Verifies an admin can approve a pending loan request and the status updates to APPROVED.",
+    "category": "Admin Loan Management",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Peminjaman\" menu item"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Pending\" status tab"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first visible pending loan request in the list"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Approve\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"APPROVED\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC070",
+    "title": "Reject a pending loan request with a rejection reason",
+    "description": "Verifies an admin can reject a pending loan request by providing a reason and the status updates to REJECTED.",
+    "category": "Admin Loan Management",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Peminjaman\" menu item"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Pending\" status tab"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first visible pending loan request in the list"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Reject\" button"
+      },
+      {
+        "type": "action",
+        "description": "Type \"Stock needed for class\" into the rejection reason field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Confirm Reject\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"REJECTED\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC071",
+    "title": "Verify a returned loan and mark it as RETURNED",
+    "description": "Verifies an admin can verify a return and the loan status updates to RETURNED.",
+    "category": "Admin Loan Management",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Peminjaman\" menu item"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Returned\" status tab"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first visible returned loan in the list"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Verify Return\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Mark as RETURNED\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"RETURNED\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC072",
+    "title": "Attempt to approve a loan already APPROVED and see an invalid action error",
+    "description": "Verifies the UI prevents approving an already-approved loan and shows an appropriate error message.",
+    "category": "Admin Loan Management",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Peminjaman\" menu item"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Approved\" status tab"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first visible approved loan in the list"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Approve\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"invalid action\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC073",
+    "title": "Mark a verified return as damaged during return verification",
+    "description": "Verifies an admin can mark a book as damaged during the return verification flow and a damage indicator is shown.",
+    "category": "Admin Loan Management",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Peminjaman\" menu item"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Returned\" status tab"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first visible returned loan in the list"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Verify Return\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Mark Damaged\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Damaged\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC074",
+    "title": "Switch between loan status tabs and verify the list updates",
+    "description": "Verifies the loan list can be filtered by status tabs and each tab displays corresponding content.",
+    "category": "Admin Loan Management",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Peminjaman\" menu item"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Status\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Pending\" status tab"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"PENDING\" is visible"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Approved\" status tab"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"APPROVED\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC075",
+    "title": "Reject flow validation: attempt to reject without providing a reason",
+    "description": "Verifies the rejection reason is required and the UI shows a validation message when submitted empty.",
+    "category": "Admin Loan Management",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Peminjaman\" menu item"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Pending\" status tab"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first visible pending loan request in the list"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Reject\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Confirm Reject\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"reason\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC076",
+    "title": "Cancel out of approve action and verify status does not change",
+    "description": "Verifies an admin can cancel an approval confirmation (if present) and the loan remains in PENDING status.",
+    "category": "Admin Loan Management",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Peminjaman\" menu item"
+      },
+      {
+        "type": "action",
+        "description": "Click on the \"Pending\" status tab"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first visible pending loan request in the list"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Approve\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Cancel\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"PENDING\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC077",
+    "title": "View Admin Reports page and see core report sections",
+    "description": "Verifies an admin can access the Reports page and see the main report widgets/sections rendered.",
+    "category": "Admin Reports",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Laporan\" in the admin navigation menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin/laporan\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Laporan\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC078",
+    "title": "View loan statistics summary on Admin Reports",
+    "description": "Verifies the loan statistics summary is visible on the Reports page after login.",
+    "category": "Admin Reports",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Laporan\" in the admin navigation menu"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/admin/laporan\""
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Ringkasan\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Peminjaman\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC079",
+    "title": "Filter reports by a valid date range",
+    "description": "Verifies the report content updates (or at least remains valid) after applying a valid date range filter.",
+    "category": "Admin Reports",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Laporan\" in the admin navigation menu"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"2026-01-01\" into the start date field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"2026-01-31\" into the end date field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Terapkan\" or \"Filter\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Ringkasan\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC080",
+    "title": "View popular books chart/section",
+    "description": "Verifies the popular books report visualization/section is visible on the Reports page.",
+    "category": "Admin Reports",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Laporan\" in the admin navigation menu"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the \"Buku Terpopuler\" section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Buku Terpopuler\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Popular books chart\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC081",
+    "title": "View active members chart/section",
+    "description": "Verifies the active members report visualization/section is visible on the Reports page.",
+    "category": "Admin Reports",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Laporan\" in the admin navigation menu"
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the \"Anggota Aktif\" section"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Anggota Aktif\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"Active members chart\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC082",
+    "title": "Filter reports with invalid date range (end date before start date)",
+    "description": "Verifies the UI prevents or warns about an invalid date range when filtering reports.",
+    "category": "Admin Reports",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Laporan\" in the admin navigation menu"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"2026-02-10\" into the start date field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"2026-02-01\" into the end date field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Terapkan\" or \"Filter\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Tanggal\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"tidak valid\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC083",
+    "title": "Clear or reset date filter back to default state",
+    "description": "Verifies an admin can return from a filtered view to the default reporting view using a reset/clear control.",
+    "category": "Admin Reports",
+    "priority": "Low",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Laporan\" in the admin navigation menu"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"2026-01-01\" into the start date field"
+      },
+      {
+        "type": "action",
+        "description": "Fill \"2026-01-31\" into the end date field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Terapkan\" or \"Filter\" button"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Reset\" or \"Clear\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Ringkasan\" is visible"
+      }
+    ]
+  },
+  {
+    "id": "TC084",
+    "title": "Reviews list renders and is visible on book detail page",
+    "description": "Verifies the reviews section is visible on the book detail page and shows existing reviews content when present.",
+    "category": "Reviews & Ratings",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_USER}}\" into the email field"
+      },
+      {
+        "type": "action",
+        "description": "Type \"{{LOGIN_PASSWORD}}\" into the password field"
+      },
+      {
+        "type": "action",
+        "description": "Click the \"Login\" button"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa\""
+      },
+      {
+        "type": "action",
+        "description": "Click on \"Katalog\" in the student navigation"
+      },
+      {
+        "type": "action",
+        "description": "Click on the first visible book in the catalog list to open its detail page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify URL contains \"/siswa/detail\""
+      },
+      {
+        "type": "action",
+        "description": "Scroll to the reviews section on the book detail page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify text \"Reviews\" or \"Ulasan\" is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify element \"rating\" or \"stars\" is visible"
+      }
+    ]
+  }
+]

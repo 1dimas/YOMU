@@ -12,7 +12,7 @@ const DEFAULT_RULES = `
 ### 1. Ketentuan Umum
 - Setiap anggota perpustakaan berhak meminjam buku dengan kartu anggota yang masih berlaku.
 - Maksimal peminjaman adalah **3 buku** sekaligus.
-- Durasi peminjaman maksimal adalah **7 hari** kalender.
+- Durasi peminjaman adalah **3 hingga 7 hari** kalender (minimal 3 hari).
 
 ### 2. Prosedur Peminjaman
 - Pilih buku yang ingin dipinjam melalui katalog.

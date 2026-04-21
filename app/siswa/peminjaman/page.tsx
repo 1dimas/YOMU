@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { loansApi } from "@/lib/api";
 import type { Loan, LoanStatus } from "@/types";
-import { BookCondition } from "@/types";
 import { toast } from "sonner";
 import SiswaSkeleton from "@/components/SiswaSkeleton";
 
@@ -30,7 +29,8 @@ export default function PeminjamanPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [filter, setFilter] = useState<FilterType>("semua");
     const [showReturnModal, setShowReturnModal] = useState<string | null>(null);
-    const [selectedCondition, setSelectedCondition] = useState<BookCondition>(BookCondition.GOOD);
+    const [reportedDamaged, setReportedDamaged] = useState<boolean>(false);
+    const [studentNote, setStudentNote] = useState<string>("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
@@ -67,13 +67,14 @@ export default function PeminjamanPage() {
         if (!showReturnModal) return;
         setIsSubmitting(true);
         try {
-            await loansApi.requestReturn(showReturnModal, selectedCondition);
-            // Refresh loans
+            await loansApi.requestReturn(showReturnModal, reportedDamaged, studentNote);
             const response = await loansApi.getMy({});
             setLoans(response.data || []);
             setShowReturnModal(null);
-            if (selectedCondition === BookCondition.GOOD) {
-                toast.success("Buku berhasil dikembalikan!");
+            setReportedDamaged(false);
+            setStudentNote("");
+            if (reportedDamaged) {
+                toast.success("Laporan dikirim. Admin akan memverifikasi kondisi buku.");
             } else {
                 toast.success("Permintaan pengembalian dikirim. Menunggu verifikasi admin.");
             }
@@ -228,38 +229,6 @@ export default function PeminjamanPage() {
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
-                    minHeight: '120px'
-                }}>
-                    <div>
-                        <div style={{ fontSize: '0.875rem', fontWeight: '600', color: '#6b7280', marginBottom: '0.5rem' }}>Selesai / Kembali</div>
-                        <div style={{ fontSize: '2.25rem', fontWeight: '800', color: '#10b981', lineHeight: 1 }}>{returnedLoans.length}</div>
-                    </div>
-                    <div style={{
-                        width: '40px',
-                        height: '40px',
-                        background: '#ecfdf5',
-                        borderRadius: '0.75rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        alignSelf: 'flex-end',
-                        marginTop: '-2rem'
-                    }}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" width="20" height="20">
-                            <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                    </div>
-                </div>
-
-                <div style={{
-                    background: 'white',
-                    padding: '1.5rem',
-                    borderRadius: '1rem',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
-                    border: '1px solid #f3f4f6',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
                     minHeight: '120px',
                     position: 'relative',
                     overflow: 'hidden'
@@ -285,6 +254,38 @@ export default function PeminjamanPage() {
                         <svg viewBox="0 0 24 24" fill="none" stroke={nearDueLoans.length > 0 ? "#f59e0b" : "#9ca3af"} strokeWidth="2" width="20" height="20">
                             <circle cx="12" cy="12" r="10" />
                             <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div style={{
+                    background: 'white',
+                    padding: '1.5rem',
+                    borderRadius: '1rem',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                    border: '1px solid #f3f4f6',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    minHeight: '120px'
+                }}>
+                    <div>
+                        <div style={{ fontSize: '0.875rem', fontWeight: '600', color: '#6b7280', marginBottom: '0.5rem' }}>Selesai / Kembali</div>
+                        <div style={{ fontSize: '2.25rem', fontWeight: '800', color: '#10b981', lineHeight: 1 }}>{returnedLoans.length}</div>
+                    </div>
+                    <div style={{
+                        width: '40px',
+                        height: '40px',
+                        background: '#ecfdf5',
+                        borderRadius: '0.75rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        alignSelf: 'flex-end',
+                        marginTop: '-2rem'
+                    }}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" width="20" height="20">
+                            <polyline points="20 6 9 17 4 12" />
                         </svg>
                     </div>
                 </div>
@@ -475,9 +476,9 @@ export default function PeminjamanPage() {
                                                 gap: '0.5rem',
                                                 marginBottom: '1rem',
                                                 padding: '0.5rem',
-                                                background: !canReturn ? (daysLeft <= 3 ? '#fffbeb' : '#f0f4ff') : '#ecfdf5',
+                                                background: '#f0f4ff',
                                                 borderRadius: '0.5rem',
-                                                color: !canReturn ? (daysLeft <= 3 ? '#b45309' : '#3b82f6') : '#059669',
+                                                color: '#3b82f6',
                                                 fontSize: '0.875rem',
                                                 fontWeight: '500'
                                             }}>
@@ -485,38 +486,35 @@ export default function PeminjamanPage() {
                                                     <circle cx="12" cy="12" r="10" />
                                                     <polyline points="12 6 12 12 16 14" />
                                                 </svg>
-                                                {canReturn
-                                                    ? 'Sudah bisa dikembalikan'
-                                                    : `Bisa dikembalikan dalam ${daysLeft} hari`}
+                                                Buku sedang dipinjam
                                             </div>
                                             <button
-                                                onClick={() => canReturn && setShowReturnModal(loan.id)}
-                                                disabled={!canReturn}
+                                                onClick={() => setShowReturnModal(loan.id)}
                                                 style={{
                                                     width: '100%',
                                                     padding: '0.75rem',
-                                                    background: canReturn ? '#2563eb' : '#94a3b8',
+                                                    background: '#2563eb',
                                                     color: 'white',
                                                     border: 'none',
                                                     borderRadius: '0.5rem',
                                                     fontWeight: '600',
-                                                    cursor: canReturn ? 'pointer' : 'not-allowed',
+                                                    cursor: 'pointer',
                                                     fontSize: '0.95rem',
                                                     transition: 'background 0.2s',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center',
                                                     gap: '0.5rem',
-                                                    opacity: canReturn ? 1 : 0.7
+                                                    opacity: 1
                                                 }}
-                                                onMouseOver={(e) => canReturn && (e.currentTarget.style.background = '#1d4ed8')}
-                                                onMouseOut={(e) => canReturn && (e.currentTarget.style.background = '#2563eb')}
+                                                onMouseOver={(e) => (e.currentTarget.style.background = '#1d4ed8')}
+                                                onMouseOut={(e) => (e.currentTarget.style.background = '#2563eb')}
                                             >
                                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
                                                     <path d="M9 14l-4-4 4-4" />
                                                     <path d="M5 10h11a4 4 0 1 1 0 8h-1" />
                                                 </svg>
-                                                {canReturn ? 'Kembalikan Buku' : `Tunggu ${daysLeft} hari lagi`}
+                                                Kembalikan Buku
                                             </button>
                                         </>
                                     );
@@ -719,62 +717,87 @@ export default function PeminjamanPage() {
                             <h3 style={{ marginBottom: '0.75rem', fontSize: '1.5rem', textAlign: 'center', fontWeight: '800', color: '#111827' }}>
                                 Kembalikan Buku
                             </h3>
-                            <p style={{ color: '#6b7280', marginBottom: '2rem', textAlign: 'center', lineHeight: 1.6 }}>
-                                Pilih kondisi buku saat ini. Buku dalam kondisi baik akan langsung dikembalikan, sedangkan buku rusak atau hilang akan diverifikasi oleh admin.
+                            <p style={{ color: '#6b7280', marginBottom: '1.5rem', textAlign: 'center', lineHeight: 1.6 }}>
+                                Laporkan kondisi buku sebelum mengembalikan.
                             </p>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2rem' }}>
+                            {/* Condition Selector */}
+                            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem', alignItems: 'stretch' }}>
                                 {[
-                                    { value: BookCondition.GOOD, label: 'Kondisi Baik', desc: 'Buku dalam keadaan utuh, bersih, dan layak dipinjamkan kembali.', color: '#10b981', bg: '#ecfdf5' },
-                                    { value: BookCondition.DAMAGED, label: 'Kondisi Rusak', desc: 'Buku mengalami kerusakan seperti halaman sobek, basah, atau kotor.', color: '#f59e0b', bg: '#fffbeb' },
-                                    { value: BookCondition.LOST, label: 'Buku Hilang', desc: 'Buku tidak dapat ditemukan atau hilang selama masa peminjaman.', color: '#ef4444', bg: '#fef2f2' },
+                                    { value: false, icon: '✅', label: 'Normal', desc: 'Buku dalam kondisi baik', color: '#10b981', bg: '#ecfdf5', border: '#6ee7b7' },
+                                    { value: true, icon: '⚠️', label: 'Rusak / Hilang', desc: 'Buku rusak atau tidak dapat ditemukan', color: '#ef4444', bg: '#fef2f2', border: '#fca5a5' },
                                 ].map(opt => (
-                                    <label
-                                        key={opt.value}
+                                    <button
+                                        key={opt.label}
+                                        type="button"
+                                        onClick={() => setReportedDamaged(opt.value)}
                                         style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '1rem',
-                                            padding: '1.25rem',
-                                            border: selectedCondition === opt.value ? `2px solid ${opt.color}` : '1px solid #e5e7eb',
+                                            flex: 1,
+                                            padding: '1.25rem 0.75rem',
                                             borderRadius: '1rem',
+                                            border: `2px solid ${reportedDamaged === opt.value ? opt.border : '#e5e7eb'}`,
+                                            background: reportedDamaged === opt.value ? opt.bg : 'white',
+                                            color: reportedDamaged === opt.value ? opt.color : '#6b7280',
                                             cursor: 'pointer',
-                                            background: selectedCondition === opt.value ? opt.bg : 'white',
                                             transition: 'all 0.2s',
-                                            position: 'relative'
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'flex-start',
+                                            height: '100%',
+                                            boxShadow: reportedDamaged === opt.value ? '0 4px 6px -1px rgba(0,0,0,0.05)' : 'none'
                                         }}
                                     >
-                                        <div style={{
-                                            width: '24px',
-                                            height: '24px',
-                                            borderRadius: '50%',
-                                            border: selectedCondition === opt.value ? `6px solid ${opt.color}` : '2px solid #d1d5db',
-                                            background: 'white',
-                                            flexShrink: 0,
-                                            transition: 'all 0.2s'
-                                        }}></div>
-                                        <input
-                                            type="radio"
-                                            name="condition"
-                                            value={opt.value}
-                                            checked={selectedCondition === opt.value}
-                                            onChange={() => setSelectedCondition(opt.value)}
-                                            style={{ display: 'none' }}
-                                        />
-                                        <div style={{ flex: 1 }}>
-                                            <div style={{ fontWeight: '700', color: '#111827', marginBottom: '0.25rem' }}>{opt.label}</div>
-                                            <div style={{ fontSize: '0.8rem', color: '#6b7280', lineHeight: 1.4 }}>{opt.desc}</div>
-                                        </div>
-                                        {selectedCondition === opt.value && (
-                                            <div style={{ position: 'absolute', right: '1.25rem', top: '50%', transform: 'translateY(-50%)' }}>
-                                                <svg viewBox="0 0 24 24" fill="none" stroke={opt.color} strokeWidth="3" width="20" height="20">
-                                                    <polyline points="20 6 9 17 4 12" />
-                                                </svg>
-                                            </div>
-                                        )}
-                                    </label>
+                                        <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{opt.icon}</div>
+                                        <div style={{ fontSize: '1.05rem', fontWeight: reportedDamaged === opt.value ? '700' : '600', marginBottom: '0.375rem', whiteSpace: 'nowrap' }}>{opt.label}</div>
+                                        <div style={{ fontSize: '0.8rem', opacity: 0.85, lineHeight: 1.4, textAlign: 'center' }}>{opt.desc}</div>
+                                    </button>
                                 ))}
                             </div>
+
+                            {reportedDamaged && (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                    <div style={{
+                                        padding: '0.875rem 1.25rem',
+                                        background: '#fef2f2',
+                                        border: '1px solid #fecaca',
+                                        borderRadius: '0.75rem',
+                                        fontSize: '0.85rem',
+                                        color: '#b91c1c',
+                                        lineHeight: 1.5,
+                                        display: 'flex',
+                                        alignItems: 'flex-start',
+                                        gap: '0.625rem'
+                                    }}>
+                                        <span style={{ fontSize: '1.1rem', flexShrink: 0, marginTop: '-2px' }}>ℹ️</span>
+                                        <span>Admin akan memverifikasi kondisi buku. Jika terbukti rusak, penggantian biaya dapat dikenakan.</span>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                        <label style={{ fontSize: '0.875rem', fontWeight: '600', color: '#374151' }}>
+                                            Keterangan Kerusakan (Opsional)
+                                        </label>
+                                        <textarea
+                                            value={studentNote}
+                                            onChange={(e) => setStudentNote(e.target.value)}
+                                            placeholder="Jelaskan bagian buku yang rusak/hilang..."
+                                            style={{
+                                                width: '100%',
+                                                padding: '0.75rem 1rem',
+                                                border: '1px solid #d1d5db',
+                                                borderRadius: '0.75rem',
+                                                fontSize: '0.95rem',
+                                                minHeight: '80px',
+                                                resize: 'vertical',
+                                                outline: 'none',
+                                                transition: 'border-color 0.2s',
+                                                fontFamily: 'inherit'
+                                            }}
+                                            onFocus={(e) => e.target.style.borderColor = '#ef4444'}
+                                            onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
+                                        />
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <div style={{
@@ -782,24 +805,27 @@ export default function PeminjamanPage() {
                             background: '#f9fafb',
                             display: 'flex',
                             gap: '1rem',
-                            borderTop: '1px solid #f3f4f6'
+                            borderTop: '1px solid #e5e7eb'
                         }}>
                             <button
                                 onClick={() => setShowReturnModal(null)}
                                 style={{
                                     flex: 1,
-                                    padding: '1rem',
-                                    border: '1px solid #e5e7eb',
+                                    padding: '0.875rem',
+                                    border: '1px solid #d1d5db',
                                     borderRadius: '0.75rem',
                                     background: 'white',
-                                    color: '#4b5563',
+                                    color: '#374151',
                                     fontSize: '0.95rem',
                                     fontWeight: '600',
                                     cursor: 'pointer',
-                                    transition: 'background 0.2s'
+                                    transition: 'all 0.2s',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
                                 }}
-                                onMouseOver={(e) => e.currentTarget.style.background = '#f3f4f6'}
-                                onMouseOut={(e) => e.currentTarget.style.background = 'white'}
+                                onMouseOver={(e) => { e.currentTarget.style.background = '#f3f4f6'; e.currentTarget.style.borderColor = '#9ca3af'; }}
+                                onMouseOut={(e) => { e.currentTarget.style.background = 'white'; e.currentTarget.style.borderColor = '#d1d5db'; }}
                             >
                                 Batal
                             </button>
@@ -808,28 +834,36 @@ export default function PeminjamanPage() {
                                 disabled={isSubmitting}
                                 style={{
                                     flex: 1,
-                                    padding: '1rem',
-                                    border: 'none',
-                                    borderRadius: '0.75rem',
+                                    padding: '0.875rem',
                                     background: '#2563eb',
                                     color: 'white',
+                                    border: 'none',
+                                    borderRadius: '0.75rem',
                                     fontSize: '0.95rem',
                                     fontWeight: '600',
                                     cursor: isSubmitting ? 'not-allowed' : 'pointer',
                                     opacity: isSubmitting ? 0.7 : 1,
-                                    boxShadow: '0 4px 6px -1px rgba(37, 99, 235, 0.2)',
+                                    transition: 'background 0.2s',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    gap: '0.5rem'
+                                    whiteSpace: 'nowrap'
                                 }}
+                                onMouseOver={(e) => !isSubmitting && (e.currentTarget.style.background = '#1d4ed8')}
+                                onMouseOut={(e) => !isSubmitting && (e.currentTarget.style.background = '#2563eb')}
                             >
                                 {isSubmitting ? (
-                                    <>
-                                        <span className="loader" style={{ width: '16px', height: '16px', border: '2px solid white', borderTopColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spin 1s linear infinite' }}></span>
-                                        Memproses...
-                                    </>
-                                ) : 'Konfirmasi'}
+                                    <svg
+                                        style={{ animation: 'spin 1s linear infinite', marginRight: '0.5rem', width: '1.25rem', height: '1.25rem' }}
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                    >
+                                        <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+                                        <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" />
+                                    </svg>
+                                ) : 'Kembalikan Sekarang'}
                             </button>
                         </div>
                     </div>
@@ -837,5 +871,4 @@ export default function PeminjamanPage() {
             )}
         </div>
     );
-
 }

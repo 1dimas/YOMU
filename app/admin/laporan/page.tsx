@@ -8,6 +8,8 @@ import { useAuth } from "@/lib/auth-context";
 import { reportsApi } from "@/lib/api";
 import type { Loan } from "@/types";
 import { toast } from "sonner";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export default function LaporanTransaksiPage() {
     const router = useRouter();
@@ -86,20 +88,55 @@ export default function LaporanTransaksiPage() {
 
     const handleExportPDF = async () => {
         try {
-            const blob = await reportsApi.exportLoansPDF({
+            // Fetch all data without pagination
+            const response = await reportsApi.getLoans({
                 status: filterStatus !== "all" ? filterStatus : undefined,
                 startDate: startDate || undefined,
                 endDate: endDate || undefined,
+                limit: 100000,
             });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `laporan-peminjaman-${new Date().toISOString().slice(0, 10)}.pdf`;
-            a.click();
-            window.URL.revokeObjectURL(url);
-            toast.success("Laporan berhasil diexport");
+            
+            const dataToExport = response.data || [];
+            const doc = new jsPDF();
+
+            doc.setFontSize(16);
+            doc.text("Laporan Peminjaman Buku", 14, 20);
+            
+            doc.setFontSize(10);
+            doc.text(`Dicetak pada: ${new Date().toLocaleDateString("id-ID")}`, 14, 28);
+            if (startDate || endDate) {
+                doc.text(`Periode: ${startDate ? formatDate(startDate) : 'Awal'} s/d ${endDate ? formatDate(endDate) : 'Sekarang'}`, 14, 34);
+            }
+
+            const tableColumn = ["No", "Nama Siswa", "Judul Buku", "Tanggal Pinjam", "Tanggal Kembali", "Status", "Kondisi"];
+            const tableRows: any[] = [];
+
+            dataToExport.forEach((loan, index) => {
+                const loanData = [
+                    index + 1,
+                    loan.user?.name || "User",
+                    loan.book?.title || "Buku",
+                    formatDate(loan.loanDate),
+                    loan.returnDate ? formatDate(loan.returnDate) : "-",
+                    getStatusLabel(loan.status),
+                    loan.isDamaged === true ? "Rusak" : (loan.status === 'RETURNED' ? "Baik" : "-")
+                ];
+                tableRows.push(loanData);
+            });
+
+            autoTable(doc, {
+                head: [tableColumn],
+                body: tableRows,
+                startY: startDate || endDate ? 40 : 35,
+                theme: 'striped',
+                styles: { fontSize: 9 },
+                headStyles: { fillColor: [37, 99, 235] }
+            });
+
+            doc.save(`laporan-peminjaman-${new Date().toISOString().slice(0, 10)}.pdf`);
+            toast.success("Laporan PDF berhasil dibuat");
         } catch {
-            toast.error("Gagal mengeksport PDF");
+            toast.error("Gagal membuat laporan PDF");
         }
     };
 
@@ -118,7 +155,7 @@ export default function LaporanTransaksiPage() {
 
             <div className="admin-content">
                 {/* Filter Row */}
-                <div className="filter-toolbar">
+                <div className="filter-toolbar print:hidden">
                     <div className="filter-group">
                         <span className="filter-label">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -151,7 +188,7 @@ export default function LaporanTransaksiPage() {
                         </select>
                     </div>
                     <div className="export-actions">
-                        <button className="btn-print" onClick={handlePrint}>
+                        <button className="btn-print print:hidden" onClick={handlePrint}>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <polyline points="6 9 6 2 18 2 18 9" />
                                 <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
@@ -159,7 +196,7 @@ export default function LaporanTransaksiPage() {
                             </svg>
                             Print
                         </button>
-                        <button className="btn-export" onClick={handleExportPDF}>
+                        <button className="btn-export print:hidden" onClick={handleExportPDF}>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                                 <polyline points="7 10 12 15 17 10" />
@@ -179,6 +216,7 @@ export default function LaporanTransaksiPage() {
                                 <th>JUDUL BUKU</th>
                                 <th>TANGGAL PINJAM</th>
                                 <th>TANGGAL KEMBALI</th>
+                                <th>KONDISI BUKU</th>
                                 <th>STATUS</th>
                             </tr>
                         </thead>
@@ -200,6 +238,29 @@ export default function LaporanTransaksiPage() {
                                     <td>{formatDate(loan.loanDate)}</td>
                                     <td>{loan.returnDate ? formatDate(loan.returnDate) : "-"}</td>
                                     <td>
+                                        {loan.isDamaged === true ? (
+                                            <span style={{
+                                                display: 'inline-flex', alignItems: 'center', gap: '4px',
+                                                background: '#fee2e2', color: '#b91c1c',
+                                                padding: '3px 8px', borderRadius: '999px',
+                                                fontSize: '0.75rem', fontWeight: 600,
+                                            }}>
+                                                ⚠️ Rusak
+                                            </span>
+                                        ) : loan.status === 'RETURNED' ? (
+                                            <span style={{
+                                                display: 'inline-flex', alignItems: 'center', gap: '4px',
+                                                background: '#dcfce7', color: '#15803d',
+                                                padding: '3px 8px', borderRadius: '999px',
+                                                fontSize: '0.75rem', fontWeight: 600,
+                                            }}>
+                                                ✅ Baik
+                                            </span>
+                                        ) : (
+                                            <span style={{ color: '#9ca3af', fontSize: '0.85rem' }}>—</span>
+                                        )}
+                                    </td>
+                                    <td>
                                         <span className={`status-badge-laporan ${loan.status === "RETURNED" ? "kembali" : "dipinjam"}`}>
                                             <span className="status-icon">
                                                 {loan.status === "RETURNED" ? (
@@ -220,7 +281,7 @@ export default function LaporanTransaksiPage() {
                                 </tr>
                             )) : (
                                 <tr>
-                                    <td colSpan={5} style={{ textAlign: "center", padding: "2rem" }}>
+                                    <td colSpan={6} style={{ textAlign: "center", padding: "2rem" }}>
                                         Tidak ada data transaksi
                                     </td>
                                 </tr>
@@ -233,7 +294,7 @@ export default function LaporanTransaksiPage() {
                     </div>
                 </div>
 
-                <footer className="admin-footer">
+                <footer className="admin-footer print:hidden">
                     © 2026 YOMU Library System.
                 </footer>
             </div>

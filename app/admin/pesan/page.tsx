@@ -308,7 +308,7 @@ export default function PusatKomunikasiPage() {
                                     {messages.length === 0 ? (
                                         <div style={{ display: 'flex', justifyContent: 'center', marginTop: '60px' }}>
                                             <div style={{ background: 'white', border: '1px solid #e5e7eb', color: '#6b7280', padding: '12px 24px', borderRadius: '16px', fontSize: '13px', textAlign: 'center', boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}>
-                                                Belum ada pesan. Mulai percakapan sekarang 💬
+                                                Belum ada pesan dalam percakapan ini. Mulai dengan mengirim pesan pertama.
                                             </div>
                                         </div>
                                     ) : (
@@ -472,8 +472,8 @@ export default function PusatKomunikasiPage() {
                                 </svg>
                             </div>
                             <h2 style={{ fontSize: '22px', fontWeight: '700', color: '#111827', marginBottom: '8px' }}>Pusat Komunikasi Admin</h2>
-                            <p style={{ fontSize: '14px', color: '#6b7280', maxWidth: '360px', lineHeight: '1.6', margin: '0 0 32px' }}>
-                                Pilih percakapan dari daftar atau mulai chat baru dengan siswa. Semua pesan tersimpan dengan aman.
+                            <p style={{ fontSize: '14px', color: '#6b7280', maxWidth: '400px', lineHeight: '1.6', margin: '0 0 32px' }}>
+                                Belum ada chat aktif. Chat akan muncul secara otomatis saat Anda memvalidasi permohonan peminjaman baru dari siswa.
                             </p>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#9ca3af', fontSize: '12px' }}>
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>

@@ -35,38 +35,29 @@ function SkeletonStatCard() {
     );
 }
 
-function SkeletonTableRow({ columns, rowIndex = 0 }: { columns: number; rowIndex?: number }) {
+function SkeletonTableRow({ columns }: { columns: number }) {
     return (
         <tr>
-            {Array.from({ length: columns }).map((_, i) => {
-                // Use deterministic widths based on column index instead of Math.random()
-                const widths = [65, 45, 75, 55, 70, 60];
-                const width = widths[(rowIndex * columns + i) % widths.length];
-
-                return (
-                    <td key={i} style={{ padding: "1rem 0.75rem" }}>
-                        {i === 1 ? (
-                            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                                <SkeletonBox width="32px" height="32px" borderRadius="50%" />
-                                <SkeletonBox width="70%" height="0.875rem" />
-                            </div>
-                        ) : (
-                            <SkeletonBox
-                                width={i === 0 ? "60px" : i === columns - 1 ? "40px" : `${width}%`}
-                                height="0.875rem"
-                            />
-                        )}
-                    </td>
-                );
-            })}
+            {Array.from({ length: columns }).map((_, i) => (
+                <td key={i} style={{ padding: "1rem 0.75rem" }}>
+                    {i === 1 ? (
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                            <SkeletonBox width="32px" height="32px" borderRadius="50%" />
+                            <SkeletonBox width="70%" height="0.875rem" />
+                        </div>
+                    ) : (
+                        <SkeletonBox
+                            width={i === 0 ? "60px" : i === columns - 1 ? "40px" : `${50 + Math.random() * 30}%`}
+                            height="0.875rem"
+                        />
+                    )}
+                </td>
+            ))}
         </tr>
     );
 }
 
 function SkeletonTable({ columns, rows }: { columns: number; rows: number }) {
-    // Deterministic widths instead of Math.random() to prevent hydration mismatches
-    const headerWidths = [60, 48, 70, 65, 58, 62];
-
     return (
         <div className="data-table-container" style={{ opacity: 1 }}>
             <table className="data-table">
@@ -74,14 +65,14 @@ function SkeletonTable({ columns, rows }: { columns: number; rows: number }) {
                     <tr>
                         {Array.from({ length: columns }).map((_, i) => (
                             <th key={i}>
-                                <SkeletonBox width={`${headerWidths[i % headerWidths.length]}%`} height="0.625rem" style={{ opacity: 0.5 }} />
+                                <SkeletonBox width={`${40 + Math.random() * 40}%`} height="0.625rem" style={{ opacity: 0.5 }} />
                             </th>
                         ))}
                     </tr>
                 </thead>
                 <tbody>
                     {Array.from({ length: rows }).map((_, i) => (
-                        <SkeletonTableRow key={i} columns={columns} rowIndex={i} />
+                        <SkeletonTableRow key={i} columns={columns} />
                     ))}
                 </tbody>
             </table>
@@ -122,14 +113,11 @@ export default function AdminSkeleton({ variant, columns, rows = 5 }: AdminSkele
                     <table className="admin-table">
                         <thead>
                             <tr>
-                                {Array.from({ length: 6 }).map((_, i) => {
-                                    const headerWidths = [65, 78, 55, 72, 60, 50];
-                                    return (
-                                        <th key={i}>
-                                            <SkeletonBox width={`${headerWidths[i]}%`} height="0.625rem" style={{ opacity: 0.5 }} />
-                                        </th>
-                                    );
-                                })}
+                                {Array.from({ length: 6 }).map((_, i) => (
+                                    <th key={i}>
+                                        <SkeletonBox width={`${40 + Math.random() * 40}%`} height="0.625rem" style={{ opacity: 0.5 }} />
+                                    </th>
+                                ))}
                             </tr>
                         </thead>
                         <tbody>
@@ -241,17 +229,14 @@ export default function AdminSkeleton({ variant, columns, rows = 5 }: AdminSkele
                             <SkeletonBox width="260px" height="0.625rem" />
                         </div>
                         <div style={{ padding: "1rem 1.25rem" }}>
-                            {Array.from({ length: 12 }).map((_, i) => {
-                                const textWidths = [75, 55, 85, 60, 90, 45, 70, 80, 50, 65, 88, 58];
-                                return (
-                                    <SkeletonBox
-                                        key={i}
-                                        width={`${textWidths[i]}%`}
-                                        height="0.75rem"
-                                        style={{ marginBottom: "0.75rem" }}
-                                    />
-                                );
-                            })}
+                            {Array.from({ length: 12 }).map((_, i) => (
+                                <SkeletonBox
+                                    key={i}
+                                    width={`${40 + Math.random() * 55}%`}
+                                    height="0.75rem"
+                                    style={{ marginBottom: "0.75rem" }}
+                                />
+                            ))}
                         </div>
                     </div>
                     <div style={{ background: "white", borderRadius: "0.75rem", border: "1px solid #e2e8f0", overflow: "hidden" }}>
@@ -261,17 +246,14 @@ export default function AdminSkeleton({ variant, columns, rows = 5 }: AdminSkele
                         </div>
                         <div style={{ padding: "1rem 1.25rem" }}>
                             <SkeletonBox width="50%" height="1.25rem" style={{ marginBottom: "1rem" }} />
-                            {Array.from({ length: 8 }).map((_, i) => {
-                                const previewWidths = [70, 90, 60, 80, 55, 75, 85, 65];
-                                return (
-                                    <SkeletonBox
-                                        key={i}
-                                        width={`${previewWidths[i]}%`}
-                                        height="0.75rem"
-                                        style={{ marginBottom: "0.75rem" }}
-                                    />
-                                );
-                            })}
+                            {Array.from({ length: 8 }).map((_, i) => (
+                                <SkeletonBox
+                                    key={i}
+                                    width={`${50 + Math.random() * 45}%`}
+                                    height="0.75rem"
+                                    style={{ marginBottom: "0.75rem" }}
+                                />
+                            ))}
                         </div>
                     </div>
                 </div>

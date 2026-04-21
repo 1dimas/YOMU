@@ -16,6 +16,7 @@ export default function ReviewsSection({ bookId }: ReviewsSectionProps) {
     const [error, setError] = useState<string | null>(null);
 
     // Form state
+    const [isFormOpen, setIsFormOpen] = useState(false);
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -94,147 +95,60 @@ export default function ReviewsSection({ bookId }: ReviewsSectionProps) {
             overflow: 'hidden',
             boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
         }}>
-            {/* Header */}
-            <div style={{
-                padding: '2rem',
-                borderBottom: '1px solid #f1f5f9'
-            }}>
-                <h2 style={{
-                    fontSize: '1.75rem',
-                    fontWeight: 700,
-                    color: '#1e293b',
-                    margin: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.75rem'
-                }}>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '28px', height: '28px', color: '#f59e0b' }}>
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                    </svg>
-                    Ulasan Pembaca
-                </h2>
-            </div>
-
-            {/* Rating Summary Section */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: stats.totalReviews > 0 ? '300px 1fr' : '1fr',
-                gap: '3rem',
-                padding: '2.5rem',
-                background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
-                borderBottom: '1px solid #fde68a'
-            }}>
-                {/* Overall Rating */}
-                <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: 'white',
-                    borderRadius: '1rem',
-                    padding: '2rem',
-                    boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)'
-                }}>
-                    <div style={{
-                        fontSize: '4.5rem',
-                        fontWeight: 800,
-                        background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        lineHeight: 1,
-                        marginBottom: '1rem'
-                    }}>
-                        {stats.totalReviews > 0 ? stats.averageRating.toFixed(1) : "0.0"}
-                    </div>
-                    <StarRating rating={stats.averageRating || 0} size={28} />
-                    <p style={{
-                        marginTop: '1rem',
-                        fontSize: '0.95rem',
-                        color: '#64748b',
-                        fontWeight: 600
-                    }}>
-                        Berdasarkan {stats.totalReviews} ulasan
-                    </p>
-                </div>
-
-                {/* Rating Distribution */}
-                {stats.totalReviews > 0 && (
-                    <div style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        gap: '0.75rem'
-                    }}>
-                        {ratingDistribution.map(({ star, count, percentage }) => (
-                            <div key={star} style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '1rem'
-                            }}>
-                                <div style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.35rem',
-                                    minWidth: '80px',
-                                    fontSize: '0.875rem',
-                                    fontWeight: 600,
-                                    color: '#475569'
-                                }}>
-                                    <span>{star}</span>
-                                    <svg viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" strokeWidth="2" style={{ width: '14px', height: '14px' }}>
-                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                                    </svg>
-                                </div>
-                                <div style={{
-                                    flex: 1,
-                                    height: '10px',
-                                    background: 'white',
-                                    borderRadius: '999px',
-                                    overflow: 'hidden',
-                                    boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.1)'
-                                }}>
-                                    <div style={{
-                                        height: '100%',
-                                        width: `${percentage}%`,
-                                        background: 'linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%)',
-                                        borderRadius: '999px',
-                                        transition: 'width 0.5s ease'
-                                    }} />
-                                </div>
-                                <span style={{
-                                    minWidth: '50px',
-                                    fontSize: '0.875rem',
-                                    color: '#64748b',
-                                    fontWeight: 600,
-                                    textAlign: 'right'
-                                }}>
-                                    {count} {count === 1 ? 'ulasan' : 'ulasan'}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
-
             {/* Review Form */}
             <div style={{ padding: '2rem' }}>
                 {isAuthenticated && !userHasReviewed ? (
                     <div style={{
                         marginBottom: '2rem',
-                        padding: '2rem',
+                        padding: '1.5rem 2rem',
                         background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
                         borderRadius: '1rem',
-                        border: '2px dashed #cbd5e1'
+                        border: '2px dashed #cbd5e1',
+                        transition: 'all 0.3s ease'
                     }}>
-                        <h3 style={{
-                            fontSize: '1.25rem',
-                            fontWeight: 700,
-                            color: '#1e293b',
-                            marginBottom: '1.5rem'
-                        }}>
-                            ✍️ Tulis Ulasan Anda
-                        </h3>
-                        <form onSubmit={handleSubmit}>
+                        <div 
+                            onClick={() => setIsFormOpen(!isFormOpen)}
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            <h3 style={{
+                                fontSize: '1.25rem',
+                                fontWeight: 700,
+                                color: '#1e293b',
+                                margin: 0
+                            }}>
+                                ✍️ Tulis Ulasan Anda
+                            </h3>
+                            <button
+                                type="button"
+                                style={{
+                                    background: 'white',
+                                    border: '1px solid #e2e8f0',
+                                    borderRadius: '50%',
+                                    width: '32px',
+                                    height: '32px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                                    transform: isFormOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                                    transition: 'transform 0.3s ease'
+                                }}
+                            >
+                                <svg viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" style={{ width: '18px', height: '18px' }}>
+                                    <polyline points="6 9 12 15 18 9" />
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        {isFormOpen && (
+                            <div style={{ marginTop: '1.5rem', borderTop: '1px solid #cbd5e1', paddingTop: '1.5rem', animation: 'fadeIn 0.3s ease-out' }}>
+                                <form onSubmit={handleSubmit}>
                             <div style={{ marginBottom: '1.5rem' }}>
                                 <label style={{
                                     display: 'block',
@@ -360,6 +274,8 @@ export default function ReviewsSection({ bookId }: ReviewsSectionProps) {
                                 )}
                             </button>
                         </form>
+                            </div>
+                        )}
                     </div>
                 ) : isAuthenticated && userHasReviewed ? (
                     <div style={{
@@ -564,6 +480,10 @@ export default function ReviewsSection({ bookId }: ReviewsSectionProps) {
                 @keyframes spin {
                     from { transform: rotate(0deg); }
                     to { transform: rotate(360deg); }
+                }
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(-10px); }
+                    to { opacity: 1; transform: translateY(0); }
                 }
             `}</style>
         </div>

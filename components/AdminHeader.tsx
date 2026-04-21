@@ -135,7 +135,7 @@ export default function AdminHeader({ title, subtitle }: AdminHeaderProps) {
     };
 
     return (
-        <header style={{
+        <header className="print:hidden" style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',

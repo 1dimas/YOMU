@@ -193,6 +193,29 @@ export default function AdminDashboard() {
                             </svg>
                         </div>
                     </div>
+
+                    {/* Buku Rusak */}
+                    <div className="admin-stat-card">
+                        <div className="stat-content">
+                            <span className="stat-label">Buku Rusak</span>
+                            <span className="stat-value">{stats?.loans?.damaged || 0}</span>
+                            <span className="stat-change danger">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                                    <line x1="12" y1="9" x2="12" y2="13" />
+                                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                                </svg>
+                                Butuh perhatian
+                            </span>
+                        </div>
+                        <div className="stat-icon red">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                                <line x1="9" y1="12" x2="15" y2="12" />
+                            </svg>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Transactions Table */}

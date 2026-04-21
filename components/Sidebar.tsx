@@ -97,7 +97,7 @@ export default function Sidebar() {
     };
 
     return (
-        <aside className="sidebar">
+        <aside className="sidebar print:hidden">
             {/* Logo */}
             <div className="sidebar-logo">
                 <div className="sidebar-logo-icon">

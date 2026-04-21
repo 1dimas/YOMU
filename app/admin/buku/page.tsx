@@ -117,15 +117,6 @@ export default function DataBukuPage() {
         try {
             await booksApi.delete(confirmDeleteId);
             setBooks((prevBooks) => prevBooks.filter(b => b.id !== confirmDeleteId));
-            
-            // Refetch categories to update book counts
-            try {
-                const catRes = await categoriesApi.getAll();
-                setCategories(catRes.data || []);
-            } catch (error) {
-                console.error("Failed to refetch categories:", error);
-            }
-            
             toast.success("Buku berhasil dihapus");
         } catch (error) {
             toast.error(error instanceof Error ? error.message : "Gagal menghapus buku");
@@ -364,7 +355,7 @@ export default function DataBukuPage() {
                                 </div>
                                 <div className="form-group">
                                     <label>Kode Buku / ISBN</label>
-                                    <input type="text" placeholder="Contoh: 978-602-1234-56-7" value={formData.isbn} onChange={(e) => setFormData({ ...formData, isbn: e.target.value })} />
+                                    <input type="text" placeholder="Contoh: 9786021234567" maxLength={13} value={formData.isbn} onChange={(e) => setFormData({ ...formData, isbn: e.target.value })} />
                                 </div>
                                 <div className="form-group">
                                     <label>Sinopsis / Deskripsi</label>

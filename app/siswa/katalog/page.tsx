@@ -97,8 +97,16 @@ function KatalogContent() {
         <div className="dashboard-content">
             {/* Page Header */}
             <div className="page-header">
-                <h1 className="page-title">Katalog Buku</h1>
-                <p className="page-subtitle">Temukan buku favoritmu dari koleksi perpustakaan kami</p>
+                <h1 className="page-title">
+                    {selectedCategory === "semua" 
+                        ? "Katalog Buku" 
+                        : categories.find(c => c.id === selectedCategory)?.name || "Katalog Buku"}
+                </h1>
+                <p className="page-subtitle">
+                    {selectedCategory === "semua" 
+                        ? "Temukan buku favoritmu dari koleksi perpustakaan kami" 
+                        : categories.find(c => c.id === selectedCategory)?.description || "Tampilkan buku berdasarkan kategori yang dipilih."}
+                </p>
             </div>
 
             {/* Filters */}

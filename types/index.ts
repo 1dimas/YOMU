@@ -89,8 +89,9 @@ export interface Loan {
     dueDate: string;
     returnDate?: string;
     status: LoanStatus;
-    bookCondition?: BookCondition;
-    returnCondition?: BookCondition;
+    isDamaged?: boolean;
+    reportedDamaged?: boolean;
+    studentNote?: string;
     adminNotes?: string;
     verifiedBy?: string;
     verifier?: Partial<User>;
@@ -216,6 +217,7 @@ export interface AdminStats {
         active: number;
         overdue: number;
         returning: number;
+        damaged: number;
         thisMonth: number;
         trend: number;
     };

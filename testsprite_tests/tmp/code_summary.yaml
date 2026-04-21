@@ -1,0 +1,403 @@
+version: "2"
+type: frontend
+tech_stack:
+  - TypeScript
+  - Next.js 16
+  - React 19
+  - TailwindCSS 4
+  - Framer Motion
+  - Sonner (toast notifications)
+  - Jose (JWT)
+routes:
+  - path: /
+    file: app/page.tsx
+    auth_required: false
+    description: Landing page / home page
+  - path: /login
+    file: app/login/page.tsx
+    auth_required: false
+    description: User login page with email and password
+  - path: /register
+    file: app/register/page.tsx
+    auth_required: false
+    description: Student registration page with name, email, class, major, password
+  - path: /forgot-password
+    file: app/forgot-password/page.tsx
+    auth_required: false
+    description: Forgot password form to request reset email
+  - path: /reset-password
+    file: app/reset-password/page.tsx
+    auth_required: false
+    description: Reset password form with token from email
+  - path: /siswa
+    file: app/siswa/page.tsx
+    auth_required: true
+    description: Student dashboard with stats and book recommendations
+  - path: /siswa/katalog
+    file: app/siswa/katalog/page.tsx
+    auth_required: true
+    description: Book catalog for students to browse and search books
+  - path: /siswa/detail
+    file: app/siswa/detail/page.tsx
+    auth_required: true
+    description: Book detail page with borrow functionality and reviews
+  - path: /siswa/peminjaman
+    file: app/siswa/peminjaman/page.tsx
+    auth_required: true
+    description: Student loan management - view and return borrowed books
+  - path: /siswa/favorit
+    file: app/siswa/favorit/page.tsx
+    auth_required: true
+    description: Student favorite books list
+  - path: /siswa/peraturan
+    file: app/siswa/peraturan/page.tsx
+    auth_required: true
+    description: Library rules and regulations for students
+  - path: /siswa/pesan
+    file: app/siswa/pesan/page.tsx
+    auth_required: true
+    description: Student messaging / chat with admin
+  - path: /admin
+    file: app/admin/page.tsx
+    auth_required: true
+    description: Admin dashboard with statistics and overview
+  - path: /admin/buku
+    file: app/admin/buku/page.tsx
+    auth_required: true
+    description: Admin book management - CRUD operations for books
+  - path: /admin/kategori
+    file: app/admin/kategori/page.tsx
+    auth_required: true
+    description: Admin category management - CRUD operations for categories
+  - path: /admin/anggota
+    file: app/admin/anggota/page.tsx
+    auth_required: true
+    description: Admin member management - view and manage users
+  - path: /admin/peminjaman
+    file: app/admin/peminjaman/page.tsx
+    auth_required: true
+    description: Admin loan management - approve/reject loans and verify returns
+  - path: /admin/laporan
+    file: app/admin/laporan/page.tsx
+    auth_required: true
+    description: Admin reports page with statistics and PDF export
+  - path: /admin/peraturan
+    file: app/admin/peraturan/page.tsx
+    auth_required: true
+    description: Admin library rules management
+  - path: /admin/pesan
+    file: app/admin/pesan/page.tsx
+    auth_required: true
+    description: Admin messaging / chat with students
+features:
+  - name: User Login
+    description: Login with email and password credentials, redirects based on role (ADMIN/SISWA)
+    files:
+      - app/login/page.tsx
+      - lib/auth-context.tsx
+      - lib/api.ts
+    entry_route: /login
+    user_interactions:
+      - Fill email input field
+      - Fill password input field
+      - Toggle password visibility
+      - Click login button to submit
+      - See error message on invalid credentials
+      - Click forgot password link
+      - Click register link
+    api_calls:
+      - method: POST
+        endpoint: /api/auth/login
+    auth_required: false
+  - name: User Registration
+    description: Register as a new student with name, email, class, major and password
+    files:
+      - app/register/page.tsx
+      - lib/auth-context.tsx
+      - lib/api.ts
+    entry_route: /register
+    user_interactions:
+      - Fill email input field
+      - Fill full name input field
+      - Select class from dropdown
+      - Select major from dropdown
+      - Fill password input field
+      - Fill confirm password field
+      - Toggle password visibility
+      - Click register button to submit
+      - See validation errors
+    api_calls:
+      - method: POST
+        endpoint: /api/auth/register
+      - method: GET
+        endpoint: /api/majors
+      - method: GET
+        endpoint: /api/classes
+    auth_required: false
+  - name: Forgot Password
+    description: Request password reset email
+    files:
+      - app/forgot-password/page.tsx
+      - lib/api.ts
+    entry_route: /forgot-password
+    user_interactions:
+      - Fill email input field
+      - Click submit button
+      - See success or error message
+    api_calls:
+      - method: POST
+        endpoint: /api/auth/forgot-password
+    auth_required: false
+  - name: Student Dashboard
+    description: Student home page with stats, recommendations, and recent activity
+    files:
+      - app/siswa/page.tsx
+      - components/Header.tsx
+      - components/Sidebar.tsx
+      - components/SiswaLayoutClient.tsx
+    entry_route: /siswa
+    user_interactions:
+      - View dashboard statistics
+      - View recommended books
+      - Navigate to catalog
+      - Navigate to loans
+    api_calls:
+      - method: GET
+        endpoint: /api/stats/siswa
+      - method: GET
+        endpoint: /api/books/recommendations
+    auth_required: true
+  - name: Book Catalog
+    description: Browse and search books with filtering and pagination
+    files:
+      - app/siswa/katalog/page.tsx
+      - components/BookCard.tsx
+    entry_route: /siswa/katalog
+    user_interactions:
+      - Search books by title
+      - Filter by category
+      - Click on book card to view detail
+      - Browse through pagination
+    api_calls:
+      - method: GET
+        endpoint: /api/books
+      - method: GET
+        endpoint: /api/categories
+    auth_required: true
+  - name: Book Detail and Borrowing
+    description: View book details, reviews, and borrow a book
+    files:
+      - app/siswa/detail/page.tsx
+      - components/reviews/
+    entry_route: /siswa/detail
+    user_interactions:
+      - View book information
+      - Read reviews and ratings
+      - Add to favorites
+      - Submit a borrow request
+      - Write a review
+    api_calls:
+      - method: GET
+        endpoint: /api/books/:id
+      - method: POST
+        endpoint: /api/loans
+      - method: POST
+        endpoint: /api/favorites
+      - method: GET
+        endpoint: /api/reviews/:bookId
+      - method: POST
+        endpoint: /api/reviews
+    auth_required: true
+  - name: Student Loan Management
+    description: View borrowed books and request returns
+    files:
+      - app/siswa/peminjaman/page.tsx
+    entry_route: /siswa/peminjaman
+    user_interactions:
+      - View list of active loans
+      - Filter loans by status
+      - Request return of a book
+      - View loan details
+    api_calls:
+      - method: GET
+        endpoint: /api/loans/my
+      - method: PATCH
+        endpoint: /api/loans/:id/request-return
+    auth_required: true
+  - name: Student Favorites
+    description: View and manage list of favorite books
+    files:
+      - app/siswa/favorit/page.tsx
+    entry_route: /siswa/favorit
+    user_interactions:
+      - View list of favorite books
+      - Remove a book from favorites
+      - Click on book to view detail
+    api_calls:
+      - method: GET
+        endpoint: /api/favorites
+      - method: DELETE
+        endpoint: /api/favorites/:bookId
+    auth_required: true
+  - name: Student Messaging
+    description: Chat with admin for support
+    files:
+      - app/siswa/pesan/page.tsx
+    entry_route: /siswa/pesan
+    user_interactions:
+      - View conversations
+      - Send a message
+      - Read messages
+      - Edit a message
+      - Delete a message
+    api_calls:
+      - method: GET
+        endpoint: /api/messages/conversations
+      - method: GET
+        endpoint: /api/messages/:conversationId
+      - method: POST
+        endpoint: /api/messages
+    auth_required: true
+  - name: Admin Dashboard
+    description: Admin overview with key metrics and statistics
+    files:
+      - app/admin/page.tsx
+      - components/AdminHeader.tsx
+      - components/AdminSidebar.tsx
+      - components/AdminLayoutClient.tsx
+    entry_route: /admin
+    user_interactions:
+      - View dashboard statistics
+      - View pending loan requests
+      - View overdue books
+    api_calls:
+      - method: GET
+        endpoint: /api/stats/admin
+    auth_required: true
+  - name: Admin Book Management
+    description: CRUD operations for managing library books
+    files:
+      - app/admin/buku/page.tsx
+    entry_route: /admin/buku
+    user_interactions:
+      - View list of all books
+      - Search and filter books
+      - Add a new book
+      - Edit book details
+      - Delete a book
+    api_calls:
+      - method: GET
+        endpoint: /api/books
+      - method: POST
+        endpoint: /api/books
+      - method: PATCH
+        endpoint: /api/books/:id
+      - method: DELETE
+        endpoint: /api/books/:id
+    auth_required: true
+  - name: Admin Category Management
+    description: CRUD operations for book categories
+    files:
+      - app/admin/kategori/page.tsx
+    entry_route: /admin/kategori
+    user_interactions:
+      - View list of categories
+      - Add a new category
+      - Edit a category
+      - Delete a category
+    api_calls:
+      - method: GET
+        endpoint: /api/categories
+      - method: POST
+        endpoint: /api/categories
+      - method: PATCH
+        endpoint: /api/categories/:id
+      - method: DELETE
+        endpoint: /api/categories/:id
+    auth_required: true
+  - name: Admin Member Management
+    description: Manage library members and users
+    files:
+      - app/admin/anggota/page.tsx
+    entry_route: /admin/anggota
+    user_interactions:
+      - View list of members
+      - Search members
+      - Add a new member
+      - Edit member details
+      - Toggle member active status
+      - Delete a member
+    api_calls:
+      - method: GET
+        endpoint: /api/users
+      - method: POST
+        endpoint: /api/users
+      - method: PATCH
+        endpoint: /api/users/:id
+      - method: PATCH
+        endpoint: /api/users/:id/toggle-status
+      - method: DELETE
+        endpoint: /api/users/:id
+    auth_required: true
+  - name: Admin Loan Management
+    description: Approve/reject loan requests and verify book returns
+    files:
+      - app/admin/peminjaman/page.tsx
+    entry_route: /admin/peminjaman
+    user_interactions:
+      - View all loans with status tabs
+      - Approve a loan request
+      - Reject a loan request
+      - Verify a book return
+      - Mark damaged books
+    api_calls:
+      - method: GET
+        endpoint: /api/loans
+      - method: PATCH
+        endpoint: /api/loans/:id/approve
+      - method: PATCH
+        endpoint: /api/loans/:id/reject
+      - method: PATCH
+        endpoint: /api/loans/:id/verify-return
+    auth_required: true
+  - name: Admin Reports
+    description: View reports and export to PDF
+    files:
+      - app/admin/laporan/page.tsx
+    entry_route: /admin/laporan
+    user_interactions:
+      - View loan statistics summary
+      - Filter reports by date range
+      - View popular books chart
+      - View active members chart
+      - Export reports to PDF
+    api_calls:
+      - method: GET
+        endpoint: /api/reports/summary
+      - method: GET
+        endpoint: /api/reports/loans
+      - method: GET
+        endpoint: /api/reports/popular-books
+      - method: GET
+        endpoint: /api/reports/active-members
+      - method: GET
+        endpoint: /api/reports/loans/pdf
+    auth_required: true
+  - name: Admin Messaging
+    description: Chat with students for support
+    files:
+      - app/admin/pesan/page.tsx
+    entry_route: /admin/pesan
+    user_interactions:
+      - View all conversations
+      - Reply to student messages
+      - Read message history
+    api_calls:
+      - method: GET
+        endpoint: /api/messages/conversations
+      - method: GET
+        endpoint: /api/messages/:conversationId
+      - method: POST
+        endpoint: /api/messages
+    auth_required: true
+known_limitations: []

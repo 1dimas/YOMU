@@ -257,7 +257,7 @@ export default function SiswaSkeleton({ variant }: SiswaSkeletonProps) {
                     {Array.from({ length: 15 }).map((_, i) => (
                         <SkeletonBox
                             key={i}
-                            width={`${40 + Math.random() * 55}%`}
+                            width={`${40 + ((i * 23) % 55)}%`}
                             height="0.75rem"
                             style={{ marginBottom: "0.875rem" }}
                         />
@@ -320,7 +320,7 @@ export default function SiswaSkeleton({ variant }: SiswaSkeletonProps) {
                     {Array.from({ length: 4 }).map((_, i) => (
                         <SkeletonBox
                             key={i}
-                            width={`${60 + Math.random() * 35}%`}
+                            width={`${60 + ((i * 11) % 35)}%`}
                             height="0.875rem"
                             style={{ marginBottom: "0.75rem" }}
                         />

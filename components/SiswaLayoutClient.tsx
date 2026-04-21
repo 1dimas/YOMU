@@ -48,7 +48,6 @@ export default function SiswaLayoutClient({
 }) {
     const { user } = useAuth();
     const pathname = usePathname();
-    const isDetailPage = pathname?.startsWith("/siswa/detail");
     const isPesanPage = pathname?.startsWith("/siswa/pesan");
     const isDashboard = pathname === "/siswa";
     const tourKey = user?.id ? `yomu_tour_done_v1_${user.id}` : null;
@@ -61,7 +60,7 @@ export default function SiswaLayoutClient({
         <div className="dashboard">
             <Sidebar />
             <main className="main-content">
-                {!isDetailPage && <Header />}
+                <Header />
                 {children}
             </main>
             {isDashboard && tourKey && <AppTour steps={siswaSteps} storageKey={tourKey} />}

@@ -26,6 +26,12 @@ export default function Header({ userName, userClass, userRole }: HeaderProps) {
         name: "",
         email: "",
     });
+    const [passwordForm, setPasswordForm] = useState({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+    });
+    const [showPasswordSection, setShowPasswordSection] = useState(false);
 
     // Notification Bell State
     const [isNotificationOpen, setIsNotificationOpen] = useState(false);
@@ -140,6 +146,8 @@ export default function Header({ userName, userClass, userRole }: HeaderProps) {
                 email: user.email || "",
             });
         }
+        setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+        setShowPasswordSection(false);
         setIsProfileOpen(true);
         setIsEditing(false);
     };
@@ -148,15 +156,38 @@ export default function Header({ userName, userClass, userRole }: HeaderProps) {
         if (!user) return;
         setIsSaving(true);
         try {
+            // Update name and email
             await authApi.updateProfile({
                 name: editForm.name,
+                email: editForm.email,
             });
+
+            // Change password if filled
+            if (showPasswordSection && passwordForm.newPassword) {
+                if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+                    toast.error("Password baru dan konfirmasi tidak cocok");
+                    setIsSaving(false);
+                    return;
+                }
+                if (passwordForm.newPassword.length < 6) {
+                    toast.error("Password baru minimal 6 karakter");
+                    setIsSaving(false);
+                    return;
+                }
+                await authApi.changePassword({
+                    currentPassword: passwordForm.currentPassword,
+                    newPassword: passwordForm.newPassword,
+                });
+            }
+
             await refreshUser();
             setIsEditing(false);
+            setShowPasswordSection(false);
+            setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
             toast.success("Profil berhasil diperbarui!");
         } catch (error) {
             console.error("Failed to update profile:", error);
-            toast.error("Gagal memperbarui profil. Silakan coba lagi.");
+            toast.error(error instanceof Error ? error.message : "Gagal memperbarui profil. Silakan coba lagi.");
         } finally {
             setIsSaving(false);
         }
@@ -464,22 +495,114 @@ export default function Header({ userName, userClass, userRole }: HeaderProps) {
                                         <input
                                             type="email"
                                             value={editForm.email}
-                                            disabled
+                                            onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
                                             style={{
                                                 width: "100%",
                                                 padding: "0.75rem 1rem",
                                                 border: "1px solid #e5e7eb",
                                                 borderRadius: "0.5rem",
                                                 fontSize: "1rem",
-                                                background: "#f9fafb",
-                                                color: "#6b7280",
-                                                cursor: "not-allowed",
+                                                outline: "none",
+                                                transition: "border-color 0.2s",
                                             }}
+                                            onFocus={(e) => (e.target.style.borderColor = "#10b981")}
+                                            onBlur={(e) => (e.target.style.borderColor = "#e5e7eb")}
                                         />
-                                        <p style={{ margin: "0.25rem 0 0", fontSize: "0.75rem", color: "#9ca3af" }}>
-                                            Email tidak dapat diubah
-                                        </p>
                                     </div>
+
+                                    {/* Password Section Toggle */}
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPasswordSection(!showPasswordSection)}
+                                        style={{
+                                            background: "none",
+                                            border: "1px dashed #d1d5db",
+                                            borderRadius: "0.5rem",
+                                            padding: "0.75rem",
+                                            cursor: "pointer",
+                                            fontSize: "0.875rem",
+                                            fontWeight: "600",
+                                            color: "#6b7280",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            gap: "0.5rem",
+                                        }}
+                                    >
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+                                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                        </svg>
+                                        {showPasswordSection ? "Batal Ubah Password" : "Ubah Password"}
+                                    </button>
+
+                                    {showPasswordSection && (
+                                        <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", padding: "1rem", background: "#f9fafb", borderRadius: "0.75rem", border: "1px solid #e5e7eb" }}>
+                                            <div>
+                                                <label style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.875rem", fontWeight: "600", color: "#374151" }}>
+                                                    Password Saat Ini
+                                                </label>
+                                                <input
+                                                    type="password"
+                                                    value={passwordForm.currentPassword}
+                                                    onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                                                    placeholder="Masukkan password saat ini"
+                                                    style={{
+                                                        width: "100%",
+                                                        padding: "0.75rem 1rem",
+                                                        border: "1px solid #e5e7eb",
+                                                        borderRadius: "0.5rem",
+                                                        fontSize: "1rem",
+                                                        outline: "none",
+                                                    }}
+                                                    onFocus={(e) => (e.target.style.borderColor = "#10b981")}
+                                                    onBlur={(e) => (e.target.style.borderColor = "#e5e7eb")}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.875rem", fontWeight: "600", color: "#374151" }}>
+                                                    Password Baru
+                                                </label>
+                                                <input
+                                                    type="password"
+                                                    value={passwordForm.newPassword}
+                                                    onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                                                    placeholder="Minimal 6 karakter"
+                                                    style={{
+                                                        width: "100%",
+                                                        padding: "0.75rem 1rem",
+                                                        border: "1px solid #e5e7eb",
+                                                        borderRadius: "0.5rem",
+                                                        fontSize: "1rem",
+                                                        outline: "none",
+                                                    }}
+                                                    onFocus={(e) => (e.target.style.borderColor = "#10b981")}
+                                                    onBlur={(e) => (e.target.style.borderColor = "#e5e7eb")}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.875rem", fontWeight: "600", color: "#374151" }}>
+                                                    Konfirmasi Password Baru
+                                                </label>
+                                                <input
+                                                    type="password"
+                                                    value={passwordForm.confirmPassword}
+                                                    onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                                                    placeholder="Ulangi password baru"
+                                                    style={{
+                                                        width: "100%",
+                                                        padding: "0.75rem 1rem",
+                                                        border: "1px solid #e5e7eb",
+                                                        borderRadius: "0.5rem",
+                                                        fontSize: "1rem",
+                                                        outline: "none",
+                                                    }}
+                                                    onFocus={(e) => (e.target.style.borderColor = "#10b981")}
+                                                    onBlur={(e) => (e.target.style.borderColor = "#e5e7eb")}
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             ) : (
                                 /* View Mode */
@@ -525,18 +648,7 @@ export default function Header({ userName, userClass, userRole }: HeaderProps) {
                                         </div>
                                     </div>
 
-                                    <div style={{ display: "flex", alignItems: "center", gap: "1rem", padding: "0.75rem", background: "#f9fafb", borderRadius: "0.75rem" }}>
-                                        <div style={{ width: "40px", height: "40px", borderRadius: "0.5rem", background: "#fce7f3", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="#db2777" strokeWidth="2" width="20" height="20">
-                                                <circle cx="12" cy="12" r="10" />
-                                                <polyline points="12 6 12 12 16 14" />
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <p style={{ margin: 0, fontSize: "0.75rem", color: "#6b7280" }}>Bergabung Sejak</p>
-                                            <p style={{ margin: 0, fontWeight: "600", color: "#111827" }}>{formatDate(user?.createdAt)}</p>
-                                        </div>
-                                    </div>
+
                                 </div>
                             )}
                         </div>

@@ -30,74 +30,27 @@ export default function KelolaKategoriPage() {
     const [deleteTargetName, setDeleteTargetName] = useState("");
     const [isDeleting, setIsDeleting] = useState(false);
 
-    // Store last refetch time to avoid excessive refetching
-    const [lastRefetchTime, setLastRefetchTime] = useState<number>(0);
-    
-    // Track if just returned from another page
-    const [justReturned, setJustReturned] = useState(false);
-
-    // Extract fetchCategories as standalone function
-    const fetchCategories = async (isInitial = false) => {
-        try {
-            const response = await categoriesApi.getAll();
-            setCategories(response.data || []);
-        } catch (error) {
-            console.error("Failed to fetch categories:", error);
-            // Show error toast only on manual/visibility refetch, not on initial load
-            if (!isInitial) {
-                toast.error("Gagal memperbarui data kategori");
-            }
-        } finally {
-            if (isInitial) {
-                setIsLoading(false);
-            }
-        }
-    };
-
-    // Initial fetch on auth state change
     useEffect(() => {
         if (!authLoading && (!isAuthenticated || user?.role !== 'ADMIN')) {
             router.push("/login");
             return;
         }
 
-        if (isAuthenticated && user?.role === 'ADMIN') {
-            fetchCategories(true);
-        }
-    }, [isAuthenticated, authLoading, router, user?.role]);
-
-    // Auto-refetch when page becomes visible
-    useEffect(() => {
-        const handleVisibilityChange = async () => {
-            // Only refetch when page becomes visible
-            if (document.visibilityState === 'visible') {
-                const now = Date.now();
-                // Debounce: only refetch if at least 5 seconds have passed since last refetch
-                if (now - lastRefetchTime > 5000) {
-                    setLastRefetchTime(now);
-                    await fetchCategories(false);
-                }
+        const fetchCategories = async () => {
+            try {
+                const response = await categoriesApi.getAll();
+                setCategories(response.data || []);
+            } catch (error) {
+                console.error("Failed to fetch categories:", error);
+            } finally {
+                setIsLoading(false);
             }
         };
 
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-
-        return () => {
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-        };
-    }, [lastRefetchTime]);
-
-    // Refetch when component mounts (in case user navigated back from another page)
-    useEffect(() => {
-        if (isAuthenticated && user?.role === 'ADMIN' && !isLoading && !justReturned) {
-            setJustReturned(true);
-            // Add slight delay to ensure backend has processed any deletions
-            const timer = setTimeout(() => {
-                fetchCategories(false);
-            }, 500);
-            return () => clearTimeout(timer);
+        if (isAuthenticated && user?.role === 'ADMIN') {
+            fetchCategories();
         }
-    }, [isAuthenticated, user?.role]);
+    }, [isAuthenticated, authLoading, router, user?.role]);
 
     const handleTambahKategori = () => {
         setFormMode("add");

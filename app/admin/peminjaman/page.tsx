@@ -9,7 +9,7 @@ import { loansApi } from "@/lib/api";
 import type { Loan, LoanStatus } from "@/types";
 import { toast } from "sonner";
 
-type FilterType = "semua" | "aktif" | "terlambat" | "pending";
+type FilterType = "semua" | "aktif" | "terlambat" | "pending" | "rusak";
 
 export default function ManajemenPeminjamanPage() {
     const router = useRouter();
@@ -25,7 +25,7 @@ export default function ManajemenPeminjamanPage() {
     const [editingLoan, setEditingLoan] = useState<Loan | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [adminNotes, setAdminNotes] = useState("");
-    const [returnCondition, setReturnCondition] = useState<string>("GOOD");
+    const [isDamaged, setIsDamaged] = useState<boolean>(false);
     const [fineAmount, setFineAmount] = useState<string>("");
 
     useEffect(() => {
@@ -62,6 +62,8 @@ export default function ManajemenPeminjamanPage() {
             return matchSearch && loan.status === "OVERDUE";
         } else if (activeFilter === "pending") {
             return matchSearch && ["PENDING", "RETURNING"].includes(loan.status);
+        } else if (activeFilter === "rusak") {
+            return matchSearch && loan.isDamaged === true;
         }
         return matchSearch;
     });
@@ -106,7 +108,7 @@ export default function ManajemenPeminjamanPage() {
     const handleOpenModal = (loan: Loan) => {
         setEditingLoan(loan);
         setAdminNotes("");
-        setReturnCondition("GOOD");
+        setIsDamaged(false);
         setFineAmount("");
         setIsModalOpen(true);
     };
@@ -115,7 +117,7 @@ export default function ManajemenPeminjamanPage() {
         setIsModalOpen(false);
         setEditingLoan(null);
         setAdminNotes("");
-        setReturnCondition("GOOD");
+        setIsDamaged(false);
         setFineAmount("");
     };
 
@@ -156,7 +158,7 @@ export default function ManajemenPeminjamanPage() {
         setIsSubmitting(true);
         try {
             const fine = fineAmount ? parseInt(fineAmount, 10) : undefined;
-            await loansApi.verifyReturn(editingLoan.id, adminNotes, returnCondition, fine);
+            await loansApi.verifyReturn(editingLoan.id, adminNotes, isDamaged, fine);
             const response = await loansApi.getAll({});
             setLoans(response.data || []);
             handleCloseModal();
@@ -171,6 +173,7 @@ export default function ManajemenPeminjamanPage() {
     const pendingCount = loans.filter(l => l.status === "PENDING").length;
     const returningCount = loans.filter(l => l.status === "RETURNING").length;
     const overdueCount = loans.filter(l => l.status === "OVERDUE").length;
+    const rusakCount = loans.filter(l => l.isDamaged === true).length;
 
     if (authLoading || isLoading) {
         return (
@@ -222,6 +225,9 @@ export default function ManajemenPeminjamanPage() {
                         <button className={`filter-tab terlambat ${activeFilter === "terlambat" ? "active" : ""}`} onClick={() => setActiveFilter("terlambat")}>
                             Terlambat ({overdueCount})
                         </button>
+                        <button className={`filter-tab ${activeFilter === "rusak" ? "active" : ""}`} onClick={() => setActiveFilter("rusak")} style={{ color: activeFilter === "rusak" ? "#fff" : "#ef4444", background: activeFilter === "rusak" ? "#ef4444" : "rgba(239, 68, 68, 0.1)", borderColor: "#ef4444" }}>
+                            Rusak ({rusakCount})
+                        </button>
                     </div>
 
                     <div className="data-search">
@@ -264,7 +270,9 @@ export default function ManajemenPeminjamanPage() {
                                             <span className="member-name">{loan.user?.name || "User"}</span>
                                         </div>
                                     </td>
-                                    <td>{loan.book?.title || "Buku"}</td>
+                                    <td>{loan.book?.title || "Buku"}
+                                        {loan.isDamaged && <span style={{ marginLeft: "8px", background: "#fee2e2", color: "#ef4444", padding: "2px 6px", borderRadius: "12px", fontSize: "11px", fontWeight: "600" }}>Rusak</span>}
+                                    </td>
                                     <td>{formatDate(loan.loanDate)}</td>
                                     <td className={loan.status === "OVERDUE" ? "text-red" : ""}>{formatDate(loan.dueDate)}</td>
                                     <td>{getStatusBadge(loan.status)}</td>
@@ -362,23 +370,59 @@ export default function ManajemenPeminjamanPage() {
                                     <span className="info-label">TENGGAT KEMBALI</span>
                                     <span className="info-value">{formatDate(editingLoan.dueDate)}</span>
                                 </div>
-                                {editingLoan.bookCondition && (() => {
-                                    const condMap: Record<string, { label: string; color: string }> = {
-                                        GOOD: { label: 'Baik', color: '#10b981' },
-                                        DAMAGED: { label: 'Rusak', color: '#f59e0b' },
-                                        LOST: { label: 'Hilang', color: '#ef4444' },
-                                    };
-                                    const cond = condMap[editingLoan.bookCondition] || { label: editingLoan.bookCondition, color: '#6b7280' };
-                                    return (
-                                        <div className="info-row">
-                                            <span className="info-label">LAPORAN SISWA</span>
-                                            <span className="info-value" style={{ color: cond.color, fontWeight: '600' }}>
-                                                {cond.label}
-                                            </span>
-                                        </div>
-                                    );
-                                })()}
+                                {editingLoan.isDamaged && (
+                                    <div className="info-row">
+                                        <span className="info-label">KONDISI BUKU</span>
+                                        <span className="info-value" style={{ color: '#ef4444', fontWeight: '600' }}>
+                                            Rusak
+                                        </span>
+                                    </div>
+                                )}
                             </div>
+
+                            {/* Pendapat Siswa - only for RETURNING */}
+                            {editingLoan.status === "RETURNING" && (
+                                <div style={{
+                                    margin: '0 0 16px 0',
+                                    padding: '14px 16px',
+                                    background: '#f8fafc',
+                                    borderRadius: '10px',
+                                    border: '1px solid #e2e8f0',
+                                }}>
+                                    <div style={{ fontSize: '12px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '10px' }}>
+                                        📋 Pendapat Siswa
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: editingLoan.studentNote ? '8px' : '0' }}>
+                                        <span style={{ fontSize: '13px', color: '#6b7280' }}>Kondisi buku menurut siswa:</span>
+                                        {editingLoan.reportedDamaged ? (
+                                            <span style={{
+                                                display: 'inline-flex', alignItems: 'center', gap: '4px',
+                                                padding: '3px 10px', borderRadius: '9999px', fontSize: '12px', fontWeight: '700',
+                                                background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca',
+                                            }}>
+                                                ⚠️ Rusak
+                                            </span>
+                                        ) : (
+                                            <span style={{
+                                                display: 'inline-flex', alignItems: 'center', gap: '4px',
+                                                padding: '3px 10px', borderRadius: '9999px', fontSize: '12px', fontWeight: '700',
+                                                background: '#ecfdf5', color: '#059669', border: '1px solid #a7f3d0',
+                                            }}>
+                                                ✅ Normal
+                                            </span>
+                                        )}
+                                    </div>
+                                    {editingLoan.studentNote && (
+                                        <div style={{
+                                            fontSize: '13px', color: '#374151', fontStyle: 'italic',
+                                            padding: '8px 12px', background: 'white', borderRadius: '6px',
+                                            border: '1px solid #e5e7eb',
+                                        }}>
+                                            &ldquo;{editingLoan.studentNote}&rdquo;
+                                        </div>
+                                    )}
+                                </div>
+                            )}
 
                             {/* Condition selector - only for RETURNING */}
                             {editingLoan.status === "RETURNING" && (
@@ -386,21 +430,20 @@ export default function ManajemenPeminjamanPage() {
                                     <label style={{ fontWeight: '600', marginBottom: '8px', display: 'block' }}>Kondisi Buku</label>
                                     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                                         {[
-                                            { value: 'GOOD', label: '✅ Baik', color: '#10b981', bg: '#ecfdf5' },
-                                            { value: 'DAMAGED', label: '⚠️ Rusak', color: '#f59e0b', bg: '#fffbeb' },
-                                            { value: 'LOST', label: '❌ Hilang', color: '#ef4444', bg: '#fef2f2' },
+                                            { value: false, label: '✅ Normal', color: '#10b981', bg: '#ecfdf5' },
+                                            { value: true, label: '⚠️ Rusak', color: '#ef4444', bg: '#fef2f2' },
                                         ].map(opt => (
                                             <button
-                                                key={opt.value}
+                                                key={opt.label}
                                                 type="button"
-                                                onClick={() => setReturnCondition(opt.value)}
+                                                onClick={() => setIsDamaged(opt.value)}
                                                 style={{
                                                     padding: '10px 20px',
                                                     borderRadius: '8px',
-                                                    border: returnCondition === opt.value ? `2px solid ${opt.color}` : '2px solid #e5e7eb',
-                                                    background: returnCondition === opt.value ? opt.bg : 'white',
-                                                    color: returnCondition === opt.value ? opt.color : '#6b7280',
-                                                    fontWeight: returnCondition === opt.value ? '600' : '400',
+                                                    border: isDamaged === opt.value ? `2px solid ${opt.color}` : '2px solid #e5e7eb',
+                                                    background: isDamaged === opt.value ? opt.bg : 'white',
+                                                    color: isDamaged === opt.value ? opt.color : '#6b7280',
+                                                    fontWeight: isDamaged === opt.value ? '600' : '400',
                                                     cursor: 'pointer',
                                                     fontSize: '14px',
                                                     transition: 'all 0.15s',
@@ -416,8 +459,8 @@ export default function ManajemenPeminjamanPage() {
                                 </div>
                             )}
 
-                            {/* Fine input - only when DAMAGED or LOST */}
-                            {editingLoan.status === "RETURNING" && returnCondition !== 'GOOD' && (
+                            {/* Fine input - only when DAMAGED */}
+                            {editingLoan.status === "RETURNING" && isDamaged && (
                                 <div className="form-group">
                                     <label style={{ fontWeight: '600', marginBottom: '8px', display: 'block' }}>Nominal Denda (Rp)</label>
                                     <input
